@@ -1,0 +1,17 @@
+{
+  "template_version": 1,
+  "template_id": "migration.v1",
+  "analysis_type": "migration",
+  "prompt_path": "prompt.md",
+  "schema_path": "schema.sql",
+  "run_stub_path": "run.ts.stub",
+  "validation_cases_path": "validation-cases.json",
+  "output_tables": ["migration_groups", "migration_findings"],
+  "required_retro_categories": ["structure", "symbols"],
+  "provider_modes": ["deterministic", "env-provider", "opencode-broker"],
+  "evidence_policy": {
+    "preserve_labels": true,
+    "ambiguous_requires_review": true
+  },
+  "write_sandbox": ".retrospec/spec"
+}

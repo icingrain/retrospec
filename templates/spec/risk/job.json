@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/spec/risk/run.ts",
+  "args": [".retrospec/generated/spec/risk/spec-validation-report.json"],
+  "env": {},
+  "writes": [".retrospec/spec/ai_analysis.db"],
+  "category": "risk",
+  "actor": "spec",
+  "capability": "ai-analysis",
+  "template_id": "risk.v1"
+}

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/spec/ai-spec-analysis/run.ts",
+  "args": [],
+  "env": {},
+  "writes": [".retrospec/spec/ai_analysis.db"],
+  "category": "risk",
+  "actor": "spec",
+  "capability": "ai-analysis",
+  "planning_skill": "ai-spec-analysis"
+}

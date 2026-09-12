@@ -1,0 +1,24 @@
+EXEC SQL BEGIN DECLARE SECTION;
+    char cusno_val[16];
+EXEC SQL END DECLARE SECTION;
+
+void unsupported_runtime_table(const char *table_name) {
+    char sqlbuf[1024];
+
+    strcpy(sqlbuf, "SELECT * FROM ");
+    strcat(sqlbuf, table_name);
+
+    EXEC SQL PREPARE runtime_stmt FROM :sqlbuf;
+}
+
+void unsupported_conditional_shape(int use_delete) {
+    char sqlbuf[1024];
+
+    if (use_delete) {
+        strcpy(sqlbuf, "DELETE FROM UCX_STAGE WHERE CUSNO = :cusno");
+    } else {
+        strcpy(sqlbuf, "UPDATE UCX_STAGE SET STATUS = 'S' WHERE CUSNO = :cusno");
+    }
+
+    EXEC SQL PREPARE conditional_stmt FROM :sqlbuf;
+}

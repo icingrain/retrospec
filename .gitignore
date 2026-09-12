@@ -1,0 +1,42 @@
+# macOS
+.DS_Store
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and build outputs
+node_modules/
+dist/
+build/
+out/
+coverage/
+
+# Logs and temporary files
+*.log
+*.tmp
+*.temp
+.cache/
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Local analysis/runtime state
+.codegraph
+.codegraph/
+.retrospec/
+.giqo/
+.omo/
+.playwright-mcp/
+.skax-davis-codeanalyzer/
+
+# Local source/reference dump used to draft plans
+source/
+.opencode/*
+!.opencode/
+!.opencode/retrospec.jsonc

@@ -1,0 +1,5 @@
+export const specTemplate = {
+  analysisType: "migration",
+  templateId: "migration.v1",
+  requiredTables: ["migration_groups", "migration_findings"],
+} as const

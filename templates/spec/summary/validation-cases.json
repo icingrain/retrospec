@@ -1,0 +1,11 @@
+{
+  "case_version": 1,
+  "template_id": "summary.v1",
+  "fixtures": [
+    {
+      "name": "minimal-summary",
+      "required_tables": ["summary_sections"],
+      "conservative_labels_required": true
+    }
+  ]
+}

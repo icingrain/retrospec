@@ -1,0 +1,105 @@
+{
+  "contract_version": 1,
+  "project_path": "replace-with-absolute-project-root",
+  "actor": "retro",
+  "skill": "replace-with-skill-name",
+  "categories": ["replace-with-category"],
+  "status_evidence": {
+    "checked": true,
+    "summary": "replace-with-analysis-status-summary"
+  },
+  "survey": {
+    "languages": [],
+    "include_paths": [],
+    "exclude_paths": [],
+    "framework_hints": [],
+    "generated_vendor_test_policy": "replace-with-skip-policy",
+    "large_file_policy": "replace-with-large-file-policy"
+  },
+  "language_capability": {
+    "matrix_path": "templates/generated-program/language-capability-matrix.json",
+    "language": "replace-with-language-key",
+    "overall_confidence": "replace-with-high-confidence-or-best-effort",
+    "category_support": [
+      {
+        "category": "replace-with-category",
+        "support_level": "replace-with-high-confidence-or-best-effort",
+        "parser_backend": "replace-with-parser-backend",
+        "evidence_label": "replace-with-EXTRACTED-INFERRED-or-AMBIGUOUS"
+      }
+    ],
+    "unsupported_categories": [
+      {
+        "category": "replace-with-unsupported-category-or-remove-entry",
+        "reason": "replace-with-unsupported-reason",
+        "missing_capability": "replace-with-missing-capability",
+        "evidence_label": "AMBIGUOUS"
+      }
+    ]
+  },
+  "reference_cases": [],
+  "selected_strategies": [
+    {
+      "name": "replace-with-strategy-name",
+      "parser_backend": "replace-with-parser-backend",
+      "categories": ["replace-with-category"],
+      "evidence_label": "replace-with-EXTRACTED-INFERRED-or-AMBIGUOUS"
+    }
+  ],
+  "skipped_strategies": [
+    {
+      "name": "replace-with-skipped-strategy-or-remove-entry",
+      "reason": "replace-with-skip-reason"
+    }
+  ],
+  "fallbacks": [
+    {
+      "reason": "replace-with-fallback-reason-or-remove-entry",
+      "missing_capability": "replace-with-missing-capability",
+      "evidence_label": "INFERRED"
+    }
+  ],
+  "expected_writes": [],
+  "handoff": {
+    "status": "replace-with-ready_for_analysis-incomplete-or-blocked",
+    "reason": "replace-with-handoff-reason"
+  },
+  "validation_loop": {
+    "required": true,
+    "sample_policy": {
+      "candidate_source": "analysis-target-files",
+      "eligible_file_count": 0,
+      "min_count": 3,
+      "max_count": 12,
+      "ratio": 0.1,
+      "strategy": "deterministic-stratified",
+      "must_cover": ["language", "extension", "requested_category"],
+      "allow_smaller_target_set": true,
+      "random_seed": null
+    },
+    "sample_selection": [
+      {
+        "id": "replace-with-sample-id",
+        "path": "replace-with-source-or-fixture-path",
+        "selection_reason": "replace-with-reference-case-or-survey-reason",
+        "covered_categories": ["replace-with-category"],
+        "language": "replace-with-language-key"
+      }
+    ],
+    "expected_evidence_source": "agent-authored-from-source-samples",
+    "generated_result_source": "replace-with-generated-program-result-or-dry-run-summary",
+    "gap_taxonomy": ["bug", "unsupported", "ambiguous", "reference-missing"],
+    "iteration_limit": 3,
+    "stop_conditions": [
+      "all_required_samples_pass",
+      "no_unresolved_bug_gap",
+      "iteration_limit_reached",
+      "no_meaningful_improvement",
+      "repeated_gap",
+      "budget_exceeded"
+    ],
+    "report_path": ".retrospec/generated/retro/replace-with-skill-name/validation-report.json",
+    "reference_candidates_path": ".retrospec/generated/retro/replace-with-skill-name/reference-candidates.jsonl",
+    "auto_merge_reference_candidates": false
+  }
+}

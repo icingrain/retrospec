@@ -1,0 +1,16 @@
+{
+  "manifest_version": 1,
+  "exports": [
+    {
+      "export_id": "replace-with-export-id",
+      "format": "csv",
+      "category": "structure",
+      "analysis_run_id": null,
+      "input_db_paths": [".retrospec/registry.db"],
+      "source_fingerprint": "replace-with-source-fingerprint",
+      "output_path": ".retrospec/exports/replace-with-export.csv",
+      "status": "planned",
+      "notes": []
+    }
+  ]
+}

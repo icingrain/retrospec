@@ -1,0 +1,45 @@
+{
+  "fixture": "code-relationship/c-java-calls",
+  "skill": "code-relationship",
+  "categories": ["call_graph"],
+  "languages": ["c", "java"],
+  "expected_edges": [
+    {
+      "caller": "customer_lookup",
+      "callee": "normalize_customer_id",
+      "source": "src/native/customer.c:18",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "caller": "customer_lookup",
+      "callee": "audit_lookup",
+      "source": "src/native/customer.c:24",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "caller": "CustomerService.findActive",
+      "callee": "CustomerRepository.findById",
+      "source": "src/main/java/com/example/CustomerService.java:31",
+      "confidence": "EXTRACTED"
+    },
+    {
+      "caller": "CustomerService.findActive",
+      "callee": "CustomerStatus.fromCode",
+      "source": "src/main/java/com/example/CustomerService.java:32",
+      "confidence": "EXTRACTED"
+    }
+  ],
+  "ambiguous_edges": [
+    {
+      "caller": "CustomerService.findActive",
+      "callee": "CustomerPort.load",
+      "reason": "interface-dispatch-without-resolver"
+    },
+    {
+      "caller": "customer_lookup",
+      "callee": "callback",
+      "reason": "function-pointer-target-unresolved"
+    }
+  ],
+  "missing_capability_policy": "Keep unresolved dispatch as AMBIGUOUS or unsupported; do not fabricate target entity ids."
+}

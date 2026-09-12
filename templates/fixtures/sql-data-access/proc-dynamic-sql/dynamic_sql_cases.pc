@@ -1,0 +1,60 @@
+EXEC SQL BEGIN DECLARE SECTION;
+    char cusno_val[16];
+    char status_val[2];
+EXEC SQL END DECLARE SECTION;
+
+typedef struct {
+    char arr[2048];
+} dynstmt_t;
+
+void delete_customer(void) {
+    char sqltmp251[1024];
+
+    sprintf(sqltmp251,
+        "DELETE        \n"
+        " FROM UCX_HALD_AAA     \n"
+        " WHERE CUSNO = :cusno   \n"
+    );
+
+    EXEC SQL PREPARE stmt2 FROM :sqltmp251;
+    EXEC SQL EXECUTE stmt2 USING :cusno_val;
+}
+
+void activate_customer(void) {
+    char sqltmp251[1024];
+
+    strcpy(sqltmp251,
+        "UPDATE UCX_STATUS SET STATUS = 'ACTIVE' WHERE CUSNO = :cusno");
+
+    EXEC SQL EXECUTE IMMEDIATE :sqltmp251;
+}
+
+void open_active_cursor(void) {
+    char sqlbuf[1024];
+
+    snprintf(sqlbuf, sizeof(sqlbuf),
+        "SELECT CUSNO, STATUS FROM UCX_STATUS WHERE STATUS = :status");
+
+    EXEC SQL DECLARE active_cur CURSOR FOR :sqlbuf;
+    EXEC SQL OPEN active_cur USING :status_val;
+}
+
+void insert_audit(dynstmt_t *ptr) {
+    strcpy((char *)ptr->arr,
+        "INSERT INTO UCX_AUDIT "
+        "(CUSNO, EVENT_CD) "
+        "VALUES (:cusno, :event_cd)");
+
+    EXEC SQL PREPARE audit_stmt FROM :ptr;
+}
+
+void rebuild_status(void) {
+    char BUF[4096];
+    int j;
+
+    memset(BUF, 0x00, sizeof(BUF));
+    j = sprintf(BUF, "DELETE UCX_CUSTOMER WHERE CUSNO = :cusno; COMMIT;");
+    j += sprintf(BUF+j, "UPDATE UCX_STATUS SET STATUS = 'R' WHERE CUSNO = :cusno; COMMIT;");
+
+    EXEC SQL PREPARE rebuild_stmt FROM :BUF;
+}

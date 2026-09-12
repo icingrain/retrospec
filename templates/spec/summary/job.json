@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/spec/summary/run.ts",
+  "args": [".retrospec/generated/spec/summary/spec-validation-report.json"],
+  "env": {},
+  "writes": [".retrospec/spec/ai_analysis.db"],
+  "category": "summary",
+  "actor": "spec",
+  "capability": "ai-analysis",
+  "template_id": "summary.v1"
+}

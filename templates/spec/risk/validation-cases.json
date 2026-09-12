@@ -1,0 +1,11 @@
+{
+  "case_version": 1,
+  "template_id": "risk.v1",
+  "fixtures": [
+    {
+      "name": "minimal-risk",
+      "required_tables": ["risk_findings"],
+      "conservative_labels_required": true
+    }
+  ]
+}

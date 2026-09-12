@@ -1,0 +1,51 @@
+{
+  "name": "retrospec-agent",
+  "version": "0.1.10",
+  "description": "Retrospec agent toolkit for daemon-backed legacy code analysis workflows.",
+  "type": "module",
+  "bin": {
+    "retrospec": "src/cli.ts"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "bun": ">=1.3.0"
+  },
+  "files": [
+    "agents/",
+    "hooks/",
+    "prompts/",
+    "scripts/",
+    "skills/",
+    "src/",
+    "templates/",
+    "docs/",
+    "git-readme/",
+    "README.md",
+    "README.en.md",
+    "DESIGN.md",
+    "biome.json",
+    "tsconfig.json"
+  ],
+  "scripts": {
+    "start": "bun run src/cli.ts",
+    "daemon": "bun run src/cli.ts daemon",
+    "status": "bun run src/cli.ts status",
+    "typecheck": "tsc --noEmit",
+    "lint": "bun --bun node_modules/@biomejs/biome/bin/biome check src tests package.json tsconfig.json biome.json",
+    "format": "bun --bun node_modules/@biomejs/biome/bin/biome check --write src tests package.json tsconfig.json biome.json",
+    "test": "bun test ./tests/phase1.test.ts ./tests/phase2.test.ts ./tests/phase3.test.ts ./tests/phase3-security.test.ts ./tests/phase4.test.ts ./tests/phase4-job.test.ts ./tests/phase4-status.test.ts ./tests/dashboard-shell.test.ts ./tests/analysis-dashboard.test.ts ./tests/dashboard-export-preview.test.ts ./tests/phase5-spec-template-validation.test.ts ./tests/phase5-exports-uploads.test.ts ./tests/phase5-graph-export.test.ts ./tests/phase6-exports.test.ts ./tests/phase6-provider-modes.test.ts ./tests/phase6-agent-bridge.test.ts ./tests/phase-ontology-explore.test.ts ./tests/phase-retrospec-mcp.test.ts ./tests/phase7-e2e-regression.test.ts ./tests/phase7-parser-contract.test.ts ./tests/phase16-generated-validation-loop.test.ts ./tests/phase7-call-graph.test.ts ./tests/phase7-graph-impact.test.ts ./tests/phase7-communities.test.ts ./tests/phase7-usage-metrics.test.ts ./tests/phase8-retro-schema-contract.test.ts ./tests/phase8b-skill-dry-run.test.ts ./tests/phase8b-final-skill-gate.test.ts ./tests/phase-custom-analysis-interview.test.ts ./tests/phase9-language-capability.test.ts ./tests/phase9-other-db.test.ts ./tests/phase10-fingerprints.test.ts ./tests/phase10-job-resume.test.ts ./tests/phase10-state-machine.test.ts ./tests/phase10-daemon-watch.test.ts ./tests/phase10-rate-limit.test.ts ./tests/phase10-export-regeneration.test.ts ./tests/phase10-glossary-import.test.ts ./tests/phase11-driver.test.ts ./tests/phase11-config.test.ts ./tests/phase11-metadata.test.ts ./tests/phase11-conservative-output.test.ts ./tests/phase12-glossary-reconciliation.test.ts ./tests/phase13-agent-routing.test.ts ./tests/phase13-no-silent-fallback.test.ts ./tests/phase13-opencode-install.test.ts ./tests/phase14-export-agent-bridge.test.ts ./tests/phase15-analysis-launch-controls.test.ts ./tests/phase17-opencode-broker-server.test.ts ./tests/phase18-provider-operations.test.ts"
+  },
+  "dependencies": {
+    "hono": "^4.6.19",
+    "ky": "^1.7.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@biomejs/cli-darwin-x64": "^1.9.4",
+    "@types/bun": "^1.1.16",
+    "typescript": "^5.7.3"
+  }
+}

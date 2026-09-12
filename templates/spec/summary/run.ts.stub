@@ -1,0 +1,5 @@
+export const specTemplate = {
+  analysisType: "summary",
+  templateId: "summary.v1",
+  requiredTables: ["summary_sections"],
+} as const

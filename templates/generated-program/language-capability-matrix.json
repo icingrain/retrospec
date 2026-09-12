@@ -1,0 +1,116 @@
+ {
+  "matrix_version": 1,
+  "artifact_task": "language-capability-matrix",
+  "confidence_terms": ["high-confidence", "best-effort", "unsupported"],
+  "evidence_labels": ["EXTRACTED", "INFERRED", "AMBIGUOUS"],
+  "categories": ["structure", "symbols", "call_graph", "dependency", "data_flow", "sql", "complexity", "security"],
+  "preflight_contract": {
+    "status_endpoint": "GET /analysis/status?project_path=<path>",
+    "matrix_document": "skills/language-capability-matrix.md",
+    "unsupported_sink": ".retrospec/retro/other.db",
+    "generated_program_field": "language_capability"
+  },
+  "languages": {
+    "c": {
+      "display_name": "C",
+      "overall_confidence": "high-confidence",
+      "coverage_preflight": "analysis/status plus Surveyor language mix before generated program planning",
+      "reference_pack": "skills/code-inventory/references/parser-strategy.md",
+      "categories": {
+        "structure": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "symbols": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "call_graph": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "dependency": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "data_flow": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "sql": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "complexity": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "security": { "support_level": "best-effort", "evidence_label": "INFERRED" }
+      }
+    },
+    "cpp": {
+      "display_name": "C++",
+      "overall_confidence": "high-confidence",
+      "coverage_preflight": "analysis/status plus Surveyor language mix before generated program planning",
+      "reference_pack": "skills/code-inventory/references/parser-strategy.md",
+      "categories": {
+        "structure": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "symbols": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "call_graph": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "dependency": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "data_flow": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "sql": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "complexity": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "security": { "support_level": "best-effort", "evidence_label": "INFERRED" }
+      }
+    },
+    "java": {
+      "display_name": "Java",
+      "overall_confidence": "high-confidence",
+      "coverage_preflight": "analysis/status plus Surveyor language mix before generated program planning",
+      "reference_pack": "skills/code-inventory/references/parser-strategy.md",
+      "categories": {
+        "structure": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "symbols": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "call_graph": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "dependency": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "data_flow": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "sql": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "complexity": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "security": { "support_level": "best-effort", "evidence_label": "INFERRED" }
+      }
+    },
+    "proc": {
+      "display_name": "Pro*C",
+      "overall_confidence": "high-confidence",
+      "coverage_preflight": "analysis/status plus Surveyor language mix before generated program planning",
+      "reference_pack": "skills/sql-data-access/references/proc-dynamic-sql-examples.md",
+      "categories": {
+        "structure": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "symbols": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "call_graph": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "dependency": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "data_flow": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "sql": { "support_level": "high-confidence", "evidence_label": "EXTRACTED" },
+        "complexity": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "security": { "support_level": "best-effort", "evidence_label": "INFERRED" }
+      }
+    },
+    "typescript": {
+      "display_name": "TypeScript",
+      "overall_confidence": "best-effort",
+      "coverage_preflight": "analysis/status plus Surveyor language mix before generated program planning",
+      "reference_pack": null,
+      "categories": {
+        "structure": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "symbols": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "call_graph": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "dependency": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "data_flow": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "sql": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "complexity": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "security": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" }
+      }
+    },
+    "python": {
+      "display_name": "Python",
+      "overall_confidence": "best-effort",
+      "coverage_preflight": "analysis/status plus Surveyor language mix before generated program planning",
+      "reference_pack": null,
+      "categories": {
+        "structure": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "symbols": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "call_graph": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "dependency": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "data_flow": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "sql": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" },
+        "complexity": { "support_level": "best-effort", "evidence_label": "INFERRED" },
+        "security": { "support_level": "unsupported", "evidence_label": "AMBIGUOUS" }
+      }
+    }
+  },
+  "fallback_policy": {
+    "best_effort": "Run only categories explicitly marked best-effort for this language and label produced evidence as INFERRED unless the generated program validation loop proves extracted source anchors.",
+    "unsupported": "Do not fabricate coverage. Record unsupported language/category evidence in .retrospec/retro/other.db.",
+    "promotion": "A best-effort or unsupported case can become supported for a single generated run only after source-backed validation; it must not be promoted into skill references automatically."
+  }
+}

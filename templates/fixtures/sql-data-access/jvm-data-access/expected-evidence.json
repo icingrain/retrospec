@@ -1,0 +1,52 @@
+{
+  "fixture": "sql-data-access/jvm-data-access",
+  "skill": "sql-data-access",
+  "category": "sql",
+  "frameworks": ["jdbc", "mybatis", "jpa", "hibernate"],
+  "expected_queries": [
+    {
+      "style": "jdbc",
+      "source": "src/main/java/com/example/CustomerJdbcRepository.java:22",
+      "method": "CustomerJdbcRepository.findActive",
+      "sql": "SELECT id, status FROM customer WHERE id = ? AND status = 'ACTIVE'",
+      "crud": "SELECT",
+      "tables": ["customer"],
+      "columns": ["id", "status"],
+      "confidence": "EXTRACTED"
+    },
+    {
+      "style": "mybatis",
+      "source": "src/main/resources/mappers/CustomerMapper.xml:7",
+      "mapper_id": "CustomerMapper.selectActive",
+      "crud": "SELECT",
+      "tables": ["customer"],
+      "confidence": "EXTRACTED"
+    },
+    {
+      "style": "jpa",
+      "source": "src/main/java/com/example/CustomerJpaRepository.java:15",
+      "method": "CustomerJpaRepository.findByStatus",
+      "sql": "select c from Customer c where c.status = :status",
+      "crud": "SELECT",
+      "tables": ["Customer"],
+      "confidence": "EXTRACTED"
+    },
+    {
+      "style": "hibernate",
+      "source": "src/main/java/com/example/CustomerHibernateDao.java:19",
+      "method": "CustomerHibernateDao.deleteInactive",
+      "sql": "delete from Customer c where c.status = :status",
+      "crud": "DELETE",
+      "tables": ["Customer"],
+      "confidence": "EXTRACTED"
+    }
+  ],
+  "ambiguous_linkage": [
+    {
+      "style": "mybatis",
+      "mapper_id": "CustomerMapper.dynamicSearch",
+      "reason": "dynamic-if-fragments-require-selected-xml-resolver"
+    }
+  ],
+  "missing_capability_policy": "Do not infer CRUD from entity names or table-like tokens; keep ORM/XML namespace gaps as AMBIGUOUS unless resolved in the generated contract."
+}

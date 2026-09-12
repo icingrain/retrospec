@@ -1,0 +1,186 @@
+{
+  "fixture_version": 1,
+  "artifact_task": "skill-fixture-dry-run-qa",
+  "required_counts": {
+    "happy_path": 3,
+    "fallback_refusal": 3,
+    "source_fit_generated_program": 3,
+    "validation_loop": 3
+  },
+  "cases": [
+    {
+      "id": "happy-retro-sql-proc-dynamic",
+      "kind": "happy_path",
+      "owner_agent": "retro",
+      "skill": "sql-data-access",
+      "request": "Analyze Pro*C dynamic SQL and CRUD matrix.",
+      "must_read": [
+        "skills/README.md",
+        "skills/sql-data-access/SKILL.md",
+        "skills/sql-data-access/references/parser-strategy.md",
+        "skills/sql-data-access/references/proc-dynamic-sql-examples.md",
+        "templates/fixtures/sql-data-access/proc-dynamic-sql/expected-evidence.json"
+      ],
+      "expected_decision": "Load sql-data-access, select Pro*C example-pack cases, and plan writes under .retrospec/retro/sql.db and .retrospec/registry.db."
+    },
+    {
+      "id": "happy-spec-ai-analysis",
+      "kind": "happy_path",
+      "owner_agent": "spec",
+      "skill": "ai-spec-analysis",
+      "request": "Analyze migration risk from Curator-confirmed handoffs.",
+      "must_read": ["skills/README.md", "skills/ai-spec-analysis/SKILL.md", "templates/spec/ai-spec-analysis/prompt.md"],
+      "expected_decision": "Load ai-spec-analysis only after Curator-confirmed handoffs and preserve AMBIGUOUS evidence as review-needed."
+    },
+    {
+      "id": "happy-archivist-report-export",
+      "kind": "happy_path",
+      "owner_agent": "Archivist",
+      "skill": "report-export",
+      "request": "Export CSV/XLSX and Markdown SOT artifacts.",
+      "must_read": ["skills/README.md", "skills/report-export/SKILL.md", "templates/report-export/prompt.md"],
+      "expected_decision": "Load report-export, write only under .retrospec/exports, and delegate render-heavy work through Excavator."
+    },
+    {
+      "id": "fallback-unsupported-language-parser",
+      "kind": "fallback_refusal",
+      "owner_agent": "retro",
+      "skill": "code-inventory",
+      "request": "Scan unsupported language symbols with full confidence.",
+      "must_read": ["skills/code-inventory/SKILL.md", "skills/code-inventory/references/parser-strategy.md"],
+      "expected_decision": "Route unsupported parser coverage to other or incomplete handoff with a named missing capability; do not claim full coverage."
+    },
+    {
+      "id": "refusal-export-outside-boundary",
+      "kind": "fallback_refusal",
+      "owner_agent": "Archivist",
+      "skill": "report-export",
+      "request": "Write export output to /tmp/outside-retrospec.",
+      "must_read": ["skills/report-export/SKILL.md", "templates/report-export/export-manifest.json"],
+      "expected_decision": "Refuse destinations outside .retrospec/exports."
+    },
+    {
+      "id": "refusal-spec-missing-handoff",
+      "kind": "fallback_refusal",
+      "owner_agent": "spec",
+      "skill": "ai-spec-analysis",
+      "request": "Run spec risk analysis without ready retro handoffs.",
+      "must_read": ["agents/spec/AGENT.md", "agents/Curator/AGENT.md", "skills/ai-spec-analysis/SKILL.md"],
+      "expected_decision": "Refuse analysis until Curator confirms required handoffs."
+    },
+    {
+      "id": "generated-code-inventory-source-fit",
+      "kind": "source_fit_generated_program",
+      "owner_agent": "retro",
+      "skill": "code-inventory",
+      "request": "Generate a source-fit structure/symbols analyzer for C and Java.",
+      "must_read": ["templates/generated-program/generation-contract.json", "templates/retro/code-inventory/prompt.md"],
+      "expected_decision": "Generate generation-contract.json, job.json, run.ts, validation-report.json, and reference-candidates.jsonl under .retrospec/generated/retro/code-inventory/."
+    },
+    {
+      "id": "generated-sql-data-access-proc",
+      "kind": "source_fit_generated_program",
+      "owner_agent": "retro",
+      "skill": "sql-data-access",
+      "request": "Generate a source-fit SQL analyzer for Pro*C dynamic SQL.",
+      "must_read": [
+        "templates/generated-program/generation-contract.json",
+        "templates/retro/sql-data-access/prompt.md",
+        "templates/fixtures/sql-data-access/proc-dynamic-sql/expected-evidence.json"
+      ],
+      "expected_decision": "Record selected/skipped Pro*C example-pack cases and expected fixture evidence before Appraiser review."
+    },
+    {
+      "id": "generated-custom-analysis-interview",
+      "kind": "source_fit_generated_program",
+      "owner_agent": "retro",
+      "skill": "custom-analysis-interview",
+      "request": "Interview for an unmatched source-backed extraction request and generate a run-local analyzer.",
+      "must_read": [
+        "skills/custom-analysis-interview/SKILL.md",
+        "templates/retro/custom-analysis-interview/prompt.md",
+        "templates/generated-program/generation-contract.json"
+      ],
+      "expected_decision": "Use Surveyor-confirmed source samples and interview answers to generate run-local artifacts under .retrospec/generated/retro/custom-analysis-interview/ with no auto-promotion."
+    },
+    {
+      "id": "validation-loop-bug-gap",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "code-relationship",
+      "request": "Validate generated call graph output against source-authored expected edges.",
+      "must_read": ["templates/generated-program/validation-report.json", "skills/code-relationship/SKILL.md"],
+      "expected_decision": "Classify wrong or missing expected edges as bug gaps and fix before Appraiser approval."
+    },
+    {
+      "id": "validation-loop-reference-candidate",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "quality-risk-scan",
+      "request": "Record a repeated source-backed missing risk reference case.",
+      "must_read": ["templates/generated-program/reference-candidates.jsonl", "skills/quality-risk-scan/references/parser-strategy.md"],
+      "expected_decision": "Write reference-missing evidence to reference-candidates.jsonl and do not auto-merge it into skills/*/references/."
+    },
+    {
+      "id": "validation-loop-skill-promotion-candidate",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "custom-analysis-interview",
+      "request": "Save a reusable custom skill candidate after a validated custom analysis run.",
+      "must_read": [
+        "templates/generated-program/skill-promotion-candidates.jsonl",
+        "skills/custom-analysis-interview/SKILL.md",
+        "agents/Appraiser/AGENT.md"
+      ],
+      "expected_decision": "Write skill-promotion-candidates.jsonl with approval_required true and auto_write_skills false; do not write into skills/ before Appraiser approval or explicit user confirmation."
+    },
+    {
+      "id": "fixture-code-inventory-c-cpp-java-symbols",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "code-inventory",
+      "request": "Validate C, C++, and Java inventory output against source-authored expected symbols.",
+      "must_read": [
+        "skills/code-inventory/references/parser-strategy.md",
+        "templates/fixtures/code-inventory/c-cpp-java-symbols/expected-evidence.json"
+      ],
+      "expected_decision": "Compare extracted files and symbols against C/C++/Java expected evidence before marking structure or symbols handoff ready."
+    },
+    {
+      "id": "fixture-code-relationship-c-java-calls",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "code-relationship",
+      "request": "Validate C and Java call graph output against source-authored expected edges.",
+      "must_read": [
+        "skills/code-relationship/references/parser-strategy.md",
+        "templates/fixtures/code-relationship/c-java-calls/expected-evidence.json"
+      ],
+      "expected_decision": "Compare extracted call edges against expected C/Java edges and keep unresolved dispatch or function-pointer targets as AMBIGUOUS."
+    },
+    {
+      "id": "fixture-sql-data-access-jvm",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "sql-data-access",
+      "request": "Validate JDBC, MyBatis, JPA, and Hibernate SQL evidence against source-authored expected queries.",
+      "must_read": [
+        "skills/sql-data-access/references/parser-strategy.md",
+        "templates/fixtures/sql-data-access/jvm-data-access/expected-evidence.json"
+      ],
+      "expected_decision": "Select only observed JVM data-access handlers and compare SQL text, CRUD, tables, columns, source anchors, and ambiguous ORM/XML linkage."
+    },
+    {
+      "id": "fixture-quality-risk-c-cpp-java",
+      "kind": "validation_loop",
+      "owner_agent": "retro",
+      "skill": "quality-risk-scan",
+      "request": "Validate C, C++, and Java complexity/security candidates against source-authored expected evidence.",
+      "must_read": [
+        "skills/quality-risk-scan/references/parser-strategy.md",
+        "templates/fixtures/quality-risk-scan/c-cpp-java-risk/expected-evidence.json"
+      ],
+      "expected_decision": "Compare complexity increments and source-anchored candidate findings while preserving missing taint/interprocedural proof as reduced confidence."
+    }
+  ]
+}

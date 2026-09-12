@@ -1,0 +1,39 @@
+{
+  "fixture": "code-inventory/c-cpp-java-symbols",
+  "skill": "code-inventory",
+  "categories": ["structure", "symbols"],
+  "languages": ["c", "cpp", "java"],
+  "expected_files": [
+    {
+      "path": "src/native/customer.c",
+      "language": "c",
+      "loc_min": 20,
+      "expected_symbols": ["customer_lookup", "customer_status", "CustomerRow", "CustomerState"]
+    },
+    {
+      "path": "src/native/customer_repository.cpp",
+      "language": "cpp",
+      "loc_min": 25,
+      "expected_symbols": ["legacy::CustomerRepository", "CustomerRepository::find", "normalizeCustomerId"]
+    },
+    {
+      "path": "src/main/java/com/example/CustomerService.java",
+      "language": "java",
+      "loc_min": 25,
+      "expected_symbols": ["CustomerService", "CustomerPort", "CustomerStatus", "CustomerService.findActive"]
+    }
+  ],
+  "required_symbol_kinds": ["function", "declaration", "struct", "enum", "class", "interface", "method", "constructor"],
+  "confidence": "EXTRACTED",
+  "skip_expectations": [
+    {
+      "path": "build/generated/CustomerStub.java",
+      "reason": "generated-path"
+    },
+    {
+      "path": "vendor/third_party/customer.c",
+      "reason": "vendor-path"
+    }
+  ],
+  "missing_capability_policy": "If one parser cannot load, mark that language reduced coverage and keep other parser-backed languages ready only when their evidence still meets thresholds."
+}

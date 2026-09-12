@@ -1,0 +1,11 @@
+{
+  "case_version": 1,
+  "template_id": "migration.v1",
+  "fixtures": [
+    {
+      "name": "minimal-migration",
+      "required_tables": ["migration_groups", "migration_findings"],
+      "conservative_labels_required": true
+    }
+  ]
+}

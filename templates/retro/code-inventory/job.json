@@ -1,0 +1,15 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/retro/code-inventory/run.ts",
+  "args": [],
+  "env": {},
+  "writes": [
+    ".retrospec/retro/structure.db",
+    ".retrospec/retro/symbols.db",
+    ".retrospec/registry.db"
+  ],
+  "category": "structure",
+  "actor": "retro",
+  "capability": "code-inventory"
+}

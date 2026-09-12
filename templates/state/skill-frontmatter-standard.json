@@ -1,0 +1,74 @@
+{
+  "schema": "retrospec.skill-frontmatter-standard.v1",
+  "skills": {
+    "code-inventory": {
+      "owner_agent": "retro",
+      "categories": ["structure", "symbols"],
+      "template_path": "templates/retro/code-inventory/",
+      "expected_writes": [
+        ".retrospec/retro/structure.db",
+        ".retrospec/retro/symbols.db",
+        ".retrospec/registry.db"
+      ],
+      "requires_generation_contract": "true"
+    },
+    "code-relationship": {
+      "owner_agent": "retro",
+      "categories": ["call_graph", "dependency", "data_flow"],
+      "template_path": "templates/retro/code-relationship/",
+      "expected_writes": [
+        ".retrospec/retro/call_graph.db",
+        ".retrospec/retro/dependency.db",
+        ".retrospec/retro/data_flow.db",
+        ".retrospec/registry.db"
+      ],
+      "requires_generation_contract": "true"
+    },
+    "sql-data-access": {
+      "owner_agent": "retro",
+      "categories": ["sql"],
+      "template_path": "templates/retro/sql-data-access/",
+      "expected_writes": [".retrospec/retro/sql.db", ".retrospec/registry.db"],
+      "requires_generation_contract": "true"
+    },
+    "quality-risk-scan": {
+      "owner_agent": "retro",
+      "categories": ["complexity", "security"],
+      "template_path": "templates/retro/quality-risk-scan/",
+      "expected_writes": [
+        ".retrospec/retro/complexity.db",
+        ".retrospec/retro/security.db",
+        ".retrospec/registry.db"
+      ],
+      "requires_generation_contract": "true"
+    },
+    "custom-analysis-interview": {
+      "owner_agent": "retro",
+      "categories": ["custom_analysis"],
+      "template_path": "templates/retro/custom-analysis-interview/",
+      "expected_writes": [".retrospec/generated/retro/custom-analysis-interview/", ".retrospec/registry.db"],
+      "requires_generation_contract": "true"
+    },
+    "glossary-context": {
+      "owner_agent": "Archivist",
+      "categories": ["glossary"],
+      "template_path": "none",
+      "expected_writes": [".retrospec/glossary/glossary.db", ".retrospec/uploads/"],
+      "requires_generation_contract": "false"
+    },
+    "ai-spec-analysis": {
+      "owner_agent": "spec",
+      "categories": ["spec", "risk", "migration", "summary"],
+      "template_path": "templates/spec/ai-spec-analysis/",
+      "expected_writes": [".retrospec/spec/ai_analysis.db"],
+      "requires_generation_contract": "false"
+    },
+    "report-export": {
+      "owner_agent": "Archivist",
+      "categories": ["export"],
+      "template_path": "templates/report-export/",
+      "expected_writes": [".retrospec/exports/manifest.json", ".retrospec/exports/"],
+      "requires_generation_contract": "false"
+    }
+  }
+}

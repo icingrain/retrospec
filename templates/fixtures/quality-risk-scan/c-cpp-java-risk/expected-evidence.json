@@ -1,0 +1,54 @@
+{
+  "fixture": "quality-risk-scan/c-cpp-java-risk",
+  "skill": "quality-risk-scan",
+  "categories": ["complexity", "security"],
+  "languages": ["c", "cpp", "java"],
+  "expected_complexity": [
+    {
+      "entity": "customer_lookup",
+      "language": "c",
+      "source": "src/native/customer.c:12",
+      "min_cyclomatic": 4,
+      "increments": ["if_statement", "for_statement", "switch_statement"]
+    },
+    {
+      "entity": "CustomerRepository::find",
+      "language": "cpp",
+      "source": "src/native/customer_repository.cpp:17",
+      "min_cyclomatic": 3,
+      "increments": ["if_statement", "call_expression"]
+    },
+    {
+      "entity": "CustomerService.findActive",
+      "language": "java",
+      "source": "src/main/java/com/example/CustomerService.java:29",
+      "min_cyclomatic": 4,
+      "increments": ["if_statement", "enhanced_for_statement", "catch_clause"]
+    }
+  ],
+  "expected_security_candidates": [
+    {
+      "check_id": "c-unsafe-copy-candidate",
+      "entity": "copy_customer_name",
+      "source": "src/native/customer.c:41",
+      "evidence": "strcpy call with source anchor",
+      "confidence": "INFERRED",
+      "missing_capability": "taint-analysis"
+    },
+    {
+      "check_id": "java-sql-concat-candidate",
+      "entity": "CustomerJdbcRepository.search",
+      "source": "src/main/java/com/example/CustomerJdbcRepository.java:47",
+      "evidence": "SQL string concatenation candidate",
+      "confidence": "INFERRED",
+      "missing_capability": "interprocedural-security-scan"
+    }
+  ],
+  "withheld_findings": [
+    {
+      "candidate": "hardcoded-placeholder-secret",
+      "reason": "test fixture path excluded by survey policy"
+    }
+  ],
+  "missing_capability_policy": "Emit candidates only with source anchors and missing proof capability; do not claim confirmed vulnerability or severity."
+}

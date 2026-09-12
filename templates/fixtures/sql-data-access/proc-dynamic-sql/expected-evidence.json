@@ -1,0 +1,97 @@
+{
+  "fixture": "templates/fixtures/sql-data-access/proc-dynamic-sql",
+  "referencePack": "skills/sql-data-access/references/proc-dynamic-sql-examples.md",
+  "positiveCases": [
+    {
+      "id": "prepare_multiline_sprintf",
+      "file": "dynamic_sql_cases.pc",
+      "parentMethod": "delete_customer",
+      "sourceType": "proc_dynamic",
+      "queryType": "DELETE",
+      "sqlText": "DELETE FROM UCX_HALD_AAA WHERE CUSNO = :cusno",
+      "tables": ["UCX_HALD_AAA"],
+      "sqlParams": [":cusno"],
+      "configData": {
+        "dynamicSqlVariable": "sqltmp251",
+        "prepareStatementName": "stmt2"
+      }
+    },
+    {
+      "id": "execute_immediate_strcpy",
+      "file": "dynamic_sql_cases.pc",
+      "parentMethod": "activate_customer",
+      "sourceType": "proc_dynamic",
+      "queryType": "UPDATE",
+      "sqlText": "UPDATE UCX_STATUS SET STATUS = 'ACTIVE' WHERE CUSNO = :cusno",
+      "tables": ["UCX_STATUS"],
+      "sqlParams": [":cusno"],
+      "configData": {
+        "dynamicSqlVariable": "sqltmp251"
+      }
+    },
+    {
+      "id": "declare_cursor_from_buffer",
+      "file": "dynamic_sql_cases.pc",
+      "parentMethod": "open_active_cursor",
+      "sourceType": "proc_dynamic",
+      "queryType": "SELECT",
+      "sqlText": "SELECT CUSNO, STATUS FROM UCX_STATUS WHERE STATUS = :status",
+      "tables": ["UCX_STATUS"],
+      "columns": ["CUSNO", "STATUS"],
+      "sqlParams": [":status"],
+      "configData": {
+        "dynamicSqlVariable": "sqlbuf",
+        "cursorName": "active_cur"
+      }
+    },
+    {
+      "id": "struct_member_buffer",
+      "file": "dynamic_sql_cases.pc",
+      "parentMethod": "insert_audit",
+      "sourceType": "proc_dynamic",
+      "queryType": "INSERT",
+      "sqlText": "INSERT INTO UCX_AUDIT (CUSNO, EVENT_CD) VALUES (:cusno, :event_cd)",
+      "tables": ["UCX_AUDIT"],
+      "sqlParams": [":cusno", ":event_cd"],
+      "confidenceNote": "High only if ptr->arr maps to EXEC SQL host variable usage; otherwise linkage must be AMBIGUOUS."
+    },
+    {
+      "id": "offset_chain_commit_split_delete",
+      "file": "dynamic_sql_cases.pc",
+      "parentMethod": "rebuild_status",
+      "sourceType": "proc_dynamic",
+      "queryType": "DELETE",
+      "sqlText": "DELETE UCX_CUSTOMER WHERE CUSNO = :cusno;",
+      "tables": ["UCX_CUSTOMER"],
+      "sqlParams": [":cusno"],
+      "splitByCommit": true
+    },
+    {
+      "id": "offset_chain_commit_split_update",
+      "file": "dynamic_sql_cases.pc",
+      "parentMethod": "rebuild_status",
+      "sourceType": "proc_dynamic",
+      "queryType": "UPDATE",
+      "sqlText": "UPDATE UCX_STATUS SET STATUS = 'R' WHERE CUSNO = :cusno;",
+      "tables": ["UCX_STATUS"],
+      "sqlParams": [":cusno"],
+      "splitByCommit": true
+    }
+  ],
+  "fallbackCases": [
+    {
+      "id": "unsupported_runtime_table",
+      "file": "unsupported_runtime_construction.pc",
+      "parentMethod": "unsupported_runtime_table",
+      "missingCapability": "runtime-table-name-resolution",
+      "expectedBehavior": "Do not emit a confident table name or CRUD/table matrix row unless a generated resolver proves table_name values for this run."
+    },
+    {
+      "id": "unsupported_conditional_shape",
+      "file": "unsupported_runtime_construction.pc",
+      "parentMethod": "unsupported_conditional_shape",
+      "missingCapability": "conditional-dynamic-sql-resolution",
+      "expectedBehavior": "Record conditional assignment evidence or reduced confidence; do not collapse mutually exclusive DELETE/UPDATE branches into one certain query without branch evidence."
+    }
+  ]
+}

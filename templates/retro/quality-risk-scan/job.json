@@ -1,0 +1,15 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/retro/quality-risk-scan/run.ts",
+  "args": [],
+  "env": {},
+  "writes": [
+    ".retrospec/retro/complexity.db",
+    ".retrospec/retro/security.db",
+    ".retrospec/registry.db"
+  ],
+  "category": "complexity",
+  "actor": "retro",
+  "capability": "quality-risk-scan"
+}

@@ -1,0 +1,12 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/spec/migration/run.ts",
+  "args": [".retrospec/generated/spec/migration/spec-validation-report.json"],
+  "env": {},
+  "writes": [".retrospec/spec/ai_analysis.db"],
+  "category": "migration",
+  "actor": "spec",
+  "capability": "ai-analysis",
+  "template_id": "migration.v1"
+}

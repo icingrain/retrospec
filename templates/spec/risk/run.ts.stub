@@ -1,0 +1,5 @@
+export const specTemplate = {
+  analysisType: "risk",
+  templateId: "risk.v1",
+  requiredTables: ["risk_findings"],
+} as const

@@ -1,0 +1,14 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/retro/sql-data-access/run.ts",
+  "args": [],
+  "env": {},
+  "writes": [
+    ".retrospec/retro/sql.db",
+    ".retrospec/registry.db"
+  ],
+  "category": "sql",
+  "actor": "retro",
+  "capability": "sql-data-access"
+}

@@ -1,0 +1,16 @@
+{
+  "manifest_version": 1,
+  "runtime": "bun",
+  "entrypoint": ".retrospec/generated/retro/code-relationship/run.ts",
+  "args": [],
+  "env": {},
+  "writes": [
+    ".retrospec/retro/call_graph.db",
+    ".retrospec/retro/dependency.db",
+    ".retrospec/retro/data_flow.db",
+    ".retrospec/registry.db"
+  ],
+  "category": "call_graph",
+  "actor": "retro",
+  "capability": "code-relationship"
+}
