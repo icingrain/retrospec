@@ -115,7 +115,7 @@ cd /path/to/your/project
 retrospec status .
 ```
 
-You do not have to start the daemon manually first. `retrospec status .` tries to start a daemon when no usable daemon exists or when the existing daemon does not match the current CLI version.
+You do not have to start the daemon manually first. `retrospec status .` tries to start a daemon when no usable daemon exists or when the existing daemon does not match the current CLI version. If an old daemon is recorded for another workspace, Retrospec shuts down that endpoint with the current runtime token and makes the new daemon current.
 
 If you prefer to keep the daemon in the foreground:
 
@@ -125,12 +125,9 @@ retrospec daemon
 
 ### Upgrade caution
 
-Updating the npm package does not replace an already-running daemon process. If `retrospec status .` shows an old version, the wrong project, or a stale port, stop the old daemon and run status again from the target project.
+After updating the npm package, run `retrospec status .` from the target project again. Retrospec cleans up the recorded daemon endpoint when it is stale, unreachable, or from an older version, then starts a current daemon.
 
 ```bash
-ps aux | grep retrospec
-kill <old-daemon-pid>
-
 cd /path/to/your/project
 retrospec status .
 ```
@@ -183,6 +180,34 @@ The exports dashboard shows lightweight previews before downloading GraphML, Cyp
 
 The daemon exposes a read-only `/mcp` JSON-RPC endpoint.
 
+When connecting directly from an MCP client such as OpenCode, start or refresh the daemon first and pass the daemon token as an authorization header. Running `retrospec status .` creates the current port/token files under the default runtime directory, `~/.retrospec/`.
+
+```bash
+retrospec status .
+cat ~/.retrospec/daemon.port
+cat ~/.retrospec/daemon.token
+```
+
+An OpenCode MCP entry can use this shape. Replace `<port>` and `<daemon-token>` with the values from those files.
+
+```json
+{
+  "mcp": {
+    "retrospec": {
+      "type": "http",
+      "url": "http://127.0.0.1:<port>/mcp",
+      "headers": {
+        "Authorization": "Bearer <daemon-token>"
+      }
+    }
+  }
+}
+```
+
+`daemon.token` is a local bearer token. Keep it in personal config only; do not commit it to the repo or paste it into shared docs. Missing auth or a token from an old daemon returns `401 unauthorized`.
+
+`/mcp` supports the lifecycle OpenCode expects plus read-only tool calls.
+
 Two tools are enabled by default.
 
 | Tool | Role |
@@ -192,8 +217,9 @@ Two tools are enabled by default.
 
 Additional tools such as `retrospec_impact`, `retrospec_epics`, `retrospec_glossary_search`, `retrospec_sql_access`, and `retrospec_export` are reserved for `RETROSPEC_MCP_TOOLS` opt-in exposure.
 
-MCP compatibility covers both flows.
+MCP compatibility covers these flows.
 
+- OpenCode lifecycle: `initialize`, `notifications/initialized`, and `ping`
 - Existing stateful/session-oriented clients: normal `tools/list` and `tools/call` JSON-RPC requests
 - 2026 stateless-style clients: self-contained requests with `MCP-Protocol-Version`, `Mcp-Method`, `Mcp-Name`, and `_meta`
 
@@ -234,6 +260,8 @@ The daemon is the local API/job server. The dashboard is the browser UI served b
 retrospec status .
 ```
 
+After an upgrade, `retrospec status .` checks the recorded runtime endpoint and replaces any daemon it can shut down with the current token. If a token-mismatched external process is still running, stop that process manually and run status again.
+
 ## Package contents
 
 ```text
@@ -254,21 +282,21 @@ The public package excludes local/private runtime state such as `.retrospec/`, `
 
 ### Status shows the wrong project
 
-An older daemon may still be running from another workspace.
+An older daemon may still be running from another workspace. First run status from the current project so Retrospec can replace the recorded endpoint. If a separate process remains, stop it manually.
 
 ```bash
-ps aux | grep retrospec
-kill <old-daemon-pid>
 cd /path/to/current/project
 retrospec status .
+
+# Only if manual cleanup is still needed:
+ps aux | grep retrospec
+kill <old-daemon-pid>
 ```
 
 ### Daemon version stays old after upgrade
 
 ```bash
 npm list -g retrospec-agent --depth=0
-ps aux | grep retrospec
-kill <old-daemon-pid>
 retrospec status .
 ```
 

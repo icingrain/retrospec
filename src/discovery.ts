@@ -50,13 +50,42 @@ export async function readEndpoint(paths = runtimePaths()): Promise<DaemonEndpoi
 
 export async function health(endpoint: DaemonEndpoint): Promise<HealthResponse | null> {
   try {
-    const body = await ky.get("health", { prefixUrl: endpoint.baseUrl, timeout: 500 }).json()
+    const body = await ky
+      .get("health", {
+        prefixUrl: endpoint.baseUrl,
+        headers: { Authorization: `Bearer ${endpoint.token}` },
+        timeout: 500,
+      })
+      .json()
     return healthResponseSchema.parse(body)
   } catch (error) {
     if (error instanceof Error) {
       return null
     }
     throw error
+  }
+}
+
+export async function shutdownEndpoint(endpoint: DaemonEndpoint): Promise<void> {
+  try {
+    await ky.post("shutdown", {
+      prefixUrl: endpoint.baseUrl,
+      headers: { Authorization: `Bearer ${endpoint.token}` },
+      timeout: 500,
+    })
+  } catch (error) {
+    if (error instanceof Error) {
+      return
+    }
+    throw error
+  }
+
+  const deadline = Date.now() + 500
+  while (Date.now() < deadline) {
+    if ((await health(endpoint)) === null) {
+      return
+    }
+    await Bun.sleep(25)
   }
 }
 
@@ -70,6 +99,9 @@ export async function ensureDaemon(
   const existingHealth = existing === null ? null : await healthEndpoint(existing)
   if (existing !== null && existingHealth !== null && existingHealth.version === version) {
     return existing
+  }
+  if (existing !== null) {
+    await shutdownEndpoint(existing)
   }
 
   const spawnProcess = options.spawnProcess ?? spawnDaemon

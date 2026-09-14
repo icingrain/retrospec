@@ -4,6 +4,7 @@ import { exploreOntology } from "./ontology-explore"
 import { projectPaths } from "./paths"
 import { ensureProjectRegistry, readRetroStatuses } from "./registry"
 import { readSpecStatuses } from "./spec/status"
+import { version } from "./version"
 
 const DEFAULT_MCP_TOOLS = ["retrospec_status", "retrospec_explore"] as const
 const OPTIONAL_MCP_TOOLS = [
@@ -25,9 +26,16 @@ type McpJsonRpcResponse = {
   readonly error?: { readonly code: number; readonly message: string }
 }
 
+type McpParsedRequest = z.infer<typeof mcpRequestSchema> & { readonly id: McpRequestId }
+
+type McpCallToolResult = {
+  readonly content: readonly { readonly type: "text"; readonly text: string }[]
+  readonly structuredContent: unknown
+}
+
 const mcpRequestSchema = z.object({
   jsonrpc: z.literal("2.0"),
-  id: z.union([z.string(), z.number(), z.null()]).default(null),
+  id: z.union([z.string(), z.number(), z.null()]).optional(),
   method: z.string().min(1),
   params: z.unknown().optional(),
 })
@@ -46,31 +54,68 @@ const exploreArgumentsSchema = z.object({
   depth: z.number().int().min(1).max(4).default(1),
 })
 
+const initializeParamsSchema = z.object({ protocolVersion: z.string().min(1) }).passthrough()
+
 export function registerMcpRoutes(app: Hono): void {
   app.post("/mcp", async (c) => {
-    const parsed = mcpRequestSchema.safeParse(await c.req.json())
+    const parsedJson = await parseJsonRequest(c.req.raw)
+    if (!parsedJson.ok) {
+      return c.json(jsonRpcError(null, -32700, "Parse error"))
+    }
+
+    const parsed = mcpRequestSchema.safeParse(parsedJson.value)
     if (!parsed.success) {
       return c.json(jsonRpcError(null, -32600, "Invalid MCP JSON-RPC request"))
     }
 
+    const requestId = parsed.data.id ?? null
+
     const headerMethod = c.req.header("Mcp-Method")
     if (headerMethod !== undefined && headerMethod !== parsed.data.method) {
-      return c.json(
-        jsonRpcError(parsed.data.id, -32600, "Mcp-Method header does not match request"),
-      )
+      return c.json(jsonRpcError(requestId, -32600, "Mcp-Method header does not match request"))
     }
     const headerName = c.req.header("Mcp-Name")
     if (headerName !== undefined && !mcpNameMatches(parsed.data.params, headerName)) {
-      return c.json(jsonRpcError(parsed.data.id, -32600, "Mcp-Name header does not match request"))
+      return c.json(jsonRpcError(requestId, -32600, "Mcp-Name header does not match request"))
     }
 
-    return c.json(await handleMcpRequest(parsed.data))
+    const response = await handleMcpRequest({ ...parsed.data, id: requestId })
+    return response === undefined ? c.body(null, 204) : c.json(response)
   })
 }
 
+async function parseJsonRequest(
+  request: Request,
+): Promise<{ readonly ok: true; readonly value: unknown } | { readonly ok: false }> {
+  try {
+    return { ok: true, value: await request.json() }
+  } catch (error) {
+    if (error instanceof Error) {
+      return { ok: false }
+    }
+    throw error
+  }
+}
+
 async function handleMcpRequest(
-  request: z.infer<typeof mcpRequestSchema>,
-): Promise<McpJsonRpcResponse> {
+  request: McpParsedRequest,
+): Promise<McpJsonRpcResponse | undefined> {
+  if (request.method === "notifications/initialized") {
+    return undefined
+  }
+
+  if (request.method === "ping") {
+    return jsonRpcResult(request.id, {})
+  }
+
+  if (request.method === "initialize") {
+    return jsonRpcResult(request.id, {
+      protocolVersion: requestedProtocolVersion(request.params),
+      capabilities: { tools: { listChanged: false } },
+      serverInfo: { name: "retrospec", version },
+    })
+  }
+
   if (request.method === "tools/list") {
     return jsonRpcResult(request.id, {
       resultType: "complete",
@@ -95,41 +140,58 @@ async function handleMcpRequest(
   }
 
   if (toolName === "retrospec_status") {
-    return jsonRpcResult(request.id, await callRetrospecStatus(parsedParams.data.arguments))
+    const parsedArguments = statusArgumentsSchema.safeParse(parsedParams.data.arguments)
+    if (!parsedArguments.success) {
+      return jsonRpcError(request.id, -32602, "Invalid retrospec_status arguments")
+    }
+    return jsonRpcResult(request.id, await callRetrospecStatus(parsedArguments.data))
   }
   if (toolName === "retrospec_explore") {
-    return jsonRpcResult(request.id, await callRetrospecExplore(parsedParams.data.arguments))
+    const parsedArguments = exploreArgumentsSchema.safeParse(parsedParams.data.arguments)
+    if (!parsedArguments.success) {
+      return jsonRpcError(request.id, -32602, "Invalid retrospec_explore arguments")
+    }
+    return jsonRpcResult(request.id, await callRetrospecExplore(parsedArguments.data))
   }
 
   return jsonRpcError(request.id, -32601, `MCP tool is not implemented: ${toolName}`)
 }
 
-async function callRetrospecStatus(argumentsRecord: Record<string, unknown>): Promise<unknown> {
-  const request = statusArgumentsSchema.parse(argumentsRecord)
+function requestedProtocolVersion(params: unknown): string {
+  const parsed = initializeParamsSchema.safeParse(params)
+  return parsed.success ? parsed.data.protocolVersion : "2024-11-05"
+}
+
+async function callRetrospecStatus(
+  request: z.infer<typeof statusArgumentsSchema>,
+): Promise<McpCallToolResult> {
   const paths = projectPaths(request.project_path)
   await ensureProjectRegistry(paths)
+  const structuredContent = {
+    project_path: paths.projectRoot,
+    retro: readRetroStatuses(paths),
+    spec: readSpecStatuses(paths),
+  }
   return {
-    resultType: "complete",
-    structuredContent: {
-      project_path: paths.projectRoot,
-      retro: readRetroStatuses(paths),
-      spec: readSpecStatuses(paths),
-    },
+    content: [{ type: "text", text: JSON.stringify(structuredContent) }],
+    structuredContent,
   }
 }
 
-async function callRetrospecExplore(argumentsRecord: Record<string, unknown>): Promise<unknown> {
-  const request = exploreArgumentsSchema.parse(argumentsRecord)
+async function callRetrospecExplore(
+  request: z.infer<typeof exploreArgumentsSchema>,
+): Promise<McpCallToolResult> {
   const paths = projectPaths(request.project_path)
   await ensureProjectRegistry(paths)
+  const structuredContent = exploreOntology(
+    paths,
+    request.anchor,
+    request.depth,
+    new Set(["structure", "semantics", "evidence"]),
+  )
   return {
-    resultType: "complete",
-    structuredContent: exploreOntology(
-      paths,
-      request.anchor,
-      request.depth,
-      new Set(["structure", "semantics", "evidence"]),
-    ),
+    content: [{ type: "text", text: JSON.stringify(structuredContent) }],
+    structuredContent,
   }
 }
 

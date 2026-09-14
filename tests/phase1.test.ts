@@ -39,6 +39,37 @@ describe("Phase 1 daemon and router", () => {
     expect(response).toMatchObject({ ok: true, version })
   })
 
+  test("Given a daemon endpoint with the wrong token When health is checked Then it is rejected", async () => {
+    const runtime = await tempRuntime()
+    const daemon = await startDaemon(runtime)
+    daemons.push(daemon)
+
+    const response = await health({
+      port: daemon.port,
+      token: "rtok_wrong",
+      baseUrl: `http://127.0.0.1:${daemon.port}`,
+    })
+
+    expect(response).toBeNull()
+  })
+
+  test("Given shutdown is requested without auth When daemon receives it Then request is unauthorized", async () => {
+    const runtime = await tempRuntime()
+    const daemon = await startDaemon(runtime)
+    daemons.push(daemon)
+
+    const response = await fetch(`http://127.0.0.1:${daemon.port}/shutdown`, { method: "POST" })
+
+    expect(response.status).toBe(401)
+    expect(
+      await health({
+        port: daemon.port,
+        token: daemon.token,
+        baseUrl: `http://127.0.0.1:${daemon.port}`,
+      }),
+    ).toMatchObject({ ok: true })
+  })
+
   test("Given a new project When router summarizes Then registry is created and retro is recommended", async () => {
     const runtime = await tempRuntime()
     const projectRoot = await tempProject()
@@ -145,5 +176,47 @@ describe("Phase 1 daemon and router", () => {
 
     expect(endpoint).toEqual(currentEndpoint)
     expect(spawned).toHaveLength(1)
+  })
+
+  test("Given a healthy daemon endpoint When daemon is ensured Then existing endpoint remains attached", async () => {
+    const runtime = await tempRuntime()
+    const currentEndpoint: DaemonEndpoint = {
+      port: 49154,
+      token: "rtok_current",
+      baseUrl: "http://127.0.0.1:49154",
+    }
+    const spawned: string[][] = []
+
+    const endpoint = await ensureDaemon(runtime, {
+      readEndpointFn: async () => currentEndpoint,
+      healthFn: async () => ({
+        ok: true,
+        version,
+        started_at: "2026-08-06T00:00:00.000Z",
+        watchers: { healthcheck_interval_ms: 30_000, watchers: [] },
+      }),
+      spawnProcess: (command) => {
+        spawned.push([...command])
+        return { unref: () => {} }
+      },
+    })
+
+    expect(endpoint).toEqual(currentEndpoint)
+    expect(spawned).toHaveLength(0)
+  })
+
+  test("Given a prior daemon in the same runtime When a daemon starts Then the prior daemon is shut down", async () => {
+    const runtime = await tempRuntime()
+    await startDaemon(runtime)
+    const firstEndpoint = await readEndpoint(runtime)
+    expect(firstEndpoint).not.toBeNull()
+
+    const second = await startDaemon(runtime)
+    daemons.push(second)
+    const currentEndpoint = await readEndpoint(runtime)
+
+    expect(currentEndpoint?.port).toBe(second.port)
+    expect(currentEndpoint?.token).toBe(second.token)
+    expect(firstEndpoint === null ? null : await health(firstEndpoint)).toBeNull()
   })
 })

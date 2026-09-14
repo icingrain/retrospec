@@ -3,6 +3,7 @@ import { Hono } from "hono"
 import { registerAgentDecisionRoutes } from "./daemon-agent-decision-routes"
 import { registerApiRoutes } from "./daemon-api-routes"
 import { registerDashboardRoutes } from "./daemon-dashboard-routes"
+import { readEndpoint, shutdownEndpoint } from "./discovery"
 import { createAuthToken } from "./ids"
 import { recoverInterruptedJobs } from "./jobs"
 import { registerMcpRoutes } from "./mcp-routes"
@@ -24,16 +25,17 @@ export function createDaemonApp(
   token: AuthToken,
   startedAt: string,
   watchers: ProjectWatcherManager = createProjectWatcherManager(),
+  onShutdown: () => void = () => {},
 ): Hono {
   const app = new Hono()
 
   app.use("*", async (c, next): Promise<Response | undefined> => {
-    if (isBrowserSurface(c.req.path)) {
+    const authorization = c.req.header("Authorization")
+    if (isBrowserSurface(c.req.path) && authorization === undefined) {
       await next()
       return
     }
 
-    const authorization = c.req.header("Authorization")
     if (authorization !== `Bearer ${token}`) {
       return c.json({ error: "unauthorized" }, 401)
     }
@@ -50,6 +52,11 @@ export function createDaemonApp(
       watchers: watchers.summary(),
     }
     return c.json(body)
+  })
+
+  app.post("/shutdown", (c) => {
+    setTimeout(onShutdown, 0)
+    return c.json({ ok: true })
   })
 
   registerDashboardRoutes(app, runtime, version, startedAt)
@@ -80,14 +87,20 @@ function isBrowserSurface(path: string): boolean {
 
 export async function startDaemon(paths = runtimePaths()): Promise<DaemonServer> {
   await ensureRuntimeDir(paths)
+  await shutdownExistingDaemon(paths)
   await recoverInterruptedJobs(paths)
 
   const token = createAuthToken()
   const startedAt = new Date().toISOString()
   const watchers = createProjectWatcherManager()
   watchers.start(() => listProjects(paths).map((project) => project.project_path))
-  const app = createDaemonApp(paths, token, startedAt, watchers)
+  let stopServer = (): void => {}
+  const app = createDaemonApp(paths, token, startedAt, watchers, () => {
+    watchers.stop()
+    stopServer()
+  })
   const server = Bun.serve({ hostname: "127.0.0.1", port: 0, fetch: app.fetch })
+  stopServer = () => server.stop(true)
   const port = server.port ?? 0
 
   if (port === 0) {
@@ -107,6 +120,14 @@ export async function startDaemon(paths = runtimePaths()): Promise<DaemonServer>
       server.stop(true)
     },
   }
+}
+
+async function shutdownExistingDaemon(paths: RuntimePaths): Promise<void> {
+  const endpoint = await readEndpoint(paths)
+  if (endpoint === null) {
+    return
+  }
+  await shutdownEndpoint(endpoint)
 }
 
 export async function runDaemonForever(paths = runtimePaths()): Promise<void> {

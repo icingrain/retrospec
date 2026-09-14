@@ -125,16 +125,13 @@ cd /path/to/your/project
 retrospec status .
 ```
 
-직접 daemon을 먼저 띄우지 않아도 됩니다. `retrospec status .`는 사용할 daemon이 없거나 현재 버전과 맞지 않으면 daemon을 시작하려고 시도합니다. foreground에서 daemon을 유지하고 싶을 때만 `retrospec daemon`을 따로 실행하세요. 이미 오래된 daemon이 살아 있거나 다른 workspace를 잡고 있으면 아래 [버전 업데이트 시 유의사항](#버전-업데이트-시-유의사항)을 먼저 확인하세요.
+직접 daemon을 먼저 띄우지 않아도 됩니다. `retrospec status .`는 사용할 daemon이 없거나 현재 버전과 맞지 않으면 daemon을 시작하려고 시도합니다. foreground에서 daemon을 유지하고 싶을 때만 `retrospec daemon`을 따로 실행하세요. 이미 오래된 daemon이 살아 있거나 다른 workspace를 잡고 있으면 현재 daemon endpoint를 종료한 뒤 새 daemon으로 교체합니다.
 
 #### 버전 업데이트 시 유의사항
 
-npm package를 업데이트해도 이미 떠 있는 daemon 프로세스가 자동으로 교체되지는 않습니다. `retrospec status .`에서 예전 버전, 다른 프로젝트, 또는 존재하지 않는 포트가 보이면 기존 daemon을 종료하고 현재 프로젝트에서 다시 확인하세요.
+npm package를 업데이트한 뒤에는 현재 프로젝트에서 `retrospec status .`를 다시 실행하세요. Retrospec은 기록된 daemon endpoint가 현재 버전과 맞지 않거나 응답하지 않으면 해당 endpoint를 종료하고 새 daemon을 띄웁니다.
 
 ```bash
-ps aux | grep retrospec
-kill <old-daemon-pid>
-
 cd /path/to/your/project
 retrospec status .
 ```
@@ -199,6 +196,34 @@ Dashboard export 화면은 GraphML/Cypher/Mermaid 파일을 내려받기 전에 
 
 Retrospec daemon은 read-only `/mcp` JSON-RPC endpoint를 제공합니다.
 
+OpenCode에 직접 MCP server로 붙일 때는 daemon port와 token을 함께 넘겨야 합니다. `retrospec status .`를 한 번 실행하면 기본 runtime 디렉터리 `~/.retrospec/`에 현재 daemon의 port/token 파일이 생성됩니다.
+
+```bash
+retrospec status .
+cat ~/.retrospec/daemon.port
+cat ~/.retrospec/daemon.token
+```
+
+OpenCode MCP 설정 예시는 다음과 같습니다. `<port>`와 `<daemon-token>`은 위 파일의 값으로 바꿉니다.
+
+```json
+{
+  "mcp": {
+    "retrospec": {
+      "type": "http",
+      "url": "http://127.0.0.1:<port>/mcp",
+      "headers": {
+        "Authorization": "Bearer <daemon-token>"
+      }
+    }
+  }
+}
+```
+
+`daemon.token`은 로컬 bearer token입니다. 개인 설정에만 넣고, repo에 커밋하거나 공유 문서에 그대로 붙여 넣지 마세요. 인증이 빠지거나 token이 예전 daemon의 값이면 `401 unauthorized`가 반환됩니다.
+
+`/mcp`는 OpenCode가 기대하는 lifecycle과 read-only tool 호출을 지원합니다.
+
 기본 노출 tool은 두 개입니다.
 
 | Tool | 역할 |
@@ -208,8 +233,9 @@ Retrospec daemon은 read-only `/mcp` JSON-RPC endpoint를 제공합니다.
 
 기본 tool 외 `retrospec_impact`, `retrospec_epics`, `retrospec_glossary_search`, `retrospec_sql_access`, `retrospec_export` 같은 확장 tool은 `RETROSPEC_MCP_TOOLS`로 opt-in할 수 있게 예약되어 있습니다.
 
-MCP client 호환성은 두 흐름을 모두 고려합니다.
+MCP client 호환성은 다음 흐름을 고려합니다.
 
+- OpenCode lifecycle: `initialize`, `notifications/initialized`, `ping` 지원
 - 기존 stateful/session 중심 client: 일반 `tools/list`, `tools/call` JSON-RPC 요청 지원
 - 2026 stateless-style client: `MCP-Protocol-Version`, `Mcp-Method`, `Mcp-Name`, `_meta`가 포함된 self-contained 요청 지원
 
@@ -246,12 +272,9 @@ Retrospec daemon은 로컬 API/job 서버이고, dashboard는 그 daemon이 제�
 
 `retrospec status .`는 daemon이 없거나 현재 CLI 버전과 맞지 않을 때 daemon 자동 시작을 시도합니다. 그래서 일반적인 첫 사용은 `retrospec status .`만으로도 시작할 수 있습니다.
 
-업데이트 후에는 기존 daemon이 계속 살아 있을 수 있습니다. 새 버전을 설치한 뒤 `retrospec status .`에서 예전 버전이나 다른 프로젝트가 보이면 기존 daemon을 종료하고 현재 프로젝트에서 다시 확인하세요.
+업데이트 후에는 현재 프로젝트에서 `retrospec status .`를 다시 실행하세요. 기록된 daemon endpoint가 예전 버전이거나 응답하지 않으면 Retrospec이 기존 endpoint 종료를 시도한 뒤 현재 버전 daemon으로 교체합니다.
 
 ```bash
-ps aux | grep retrospec
-kill <PID>
-
 cd /path/to/your/project
 retrospec status .
 ```
@@ -282,31 +305,30 @@ Public package에는 runtime/local/private 상태가 포함되지 않습니다.
 
 ### `retrospec status .`가 다른 프로젝트를 보여줄 때
 
-기존 daemon이 다른 workspace에서 떠 있는 상태일 수 있습니다.
+기존 daemon이 다른 workspace에서 떠 있는 상태일 수 있습니다. 먼저 현재 프로젝트에서 `retrospec status .`를 실행해 기록된 daemon endpoint 교체를 시도하세요. 그래도 다른 프로세스가 남아 있으면 수동으로 종료합니다.
 
 ```bash
+cd /path/to/current/project
+retrospec status .
+
+# 필요한 경우에만 수동 정리
 ps aux | grep retrospec
 kill <old-daemon-pid>
-cd /path/to/current/project
-retrospec daemon
-retrospec status .
 ```
 
 ### 새 버전을 설치했는데 daemon version이 그대로일 때
 
-npm package는 업데이트됐지만 daemon 프로세스는 자동으로 교체되지 않습니다. daemon을 재시작하세요.
+npm package를 업데이트한 뒤 현재 프로젝트에서 `retrospec status .`를 다시 실행하세요. 현재 endpoint가 예전 버전이면 Retrospec이 종료 후 재시작을 시도합니다.
 
 ```bash
 npm list -g retrospec-agent --depth=0
-ps aux | grep retrospec
-kill <old-daemon-pid>
 retrospec status .
 ```
 
 OpenCode agent에게 맡기는 경우에는 다음처럼 요청하세요.
 
 ```text
-OpenCode에서 retrospec-agent 설치 상태와 실행 중인 daemon 포트를 확인하고, 오래된 daemon이면 종료한 뒤 현재 프로젝트 기준으로 status와 dashboard URL을 확인해줘. docs/agent-install.md를 참고해줘.
+OpenCode에서 retrospec-agent 설치 상태와 실행 중인 daemon 포트/token을 확인하고, 현재 프로젝트 기준으로 status와 dashboard URL, MCP 설정값까지 확인해줘. docs/agent-install.md를 참고해줘.
 ```
 
 ### `retrospec --version`이 동작하지 않을 때
