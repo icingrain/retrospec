@@ -1,6 +1,6 @@
 {
   "name": "retrospec-agent",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "Retrospec agent toolkit for daemon-backed legacy code analysis workflows.",
   "type": "module",
   "bin": {

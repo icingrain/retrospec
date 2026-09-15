@@ -36,7 +36,13 @@ describe("Phase 6 Retrospec MCP compatibility", () => {
       .json<{
         readonly result: {
           readonly content: readonly { readonly type: string; readonly text: string }[]
-          readonly tools: readonly { readonly name: string }[]
+          readonly tools: readonly {
+            readonly name: string
+            readonly inputSchema: {
+              readonly properties: Record<string, unknown>
+              readonly required?: readonly string[]
+            }
+          }[]
         }
       }>()
 
@@ -44,6 +50,9 @@ describe("Phase 6 Retrospec MCP compatibility", () => {
       "retrospec_status",
       "retrospec_explore",
     ])
+    expect(listed.result.tools[0]?.inputSchema.required).toEqual(["project_path"])
+    expect(listed.result.tools[1]?.inputSchema.required).toEqual(["project_path", "anchor"])
+    expect(listed.result.tools[1]?.inputSchema.properties).toHaveProperty("depth")
 
     const called = await ky
       .post("mcp", {

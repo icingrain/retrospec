@@ -210,8 +210,10 @@ OpenCode MCP 설정 예시는 다음과 같습니다. `<port>`와 `<daemon-token
 {
   "mcp": {
     "retrospec": {
-      "type": "http",
+      "enabled": true,
+      "type": "remote",
       "url": "http://127.0.0.1:<port>/mcp",
+      "oauth": false,
       "headers": {
         "Authorization": "Bearer <daemon-token>"
       }

@@ -194,8 +194,10 @@ An OpenCode MCP entry can use this shape. Replace `<port>` and `<daemon-token>` 
 {
   "mcp": {
     "retrospec": {
-      "type": "http",
+      "enabled": true,
+      "type": "remote",
       "url": "http://127.0.0.1:<port>/mcp",
+      "oauth": false,
       "headers": {
         "Authorization": "Bearer <daemon-token>"
       }

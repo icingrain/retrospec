@@ -219,8 +219,52 @@ function toolDescription(name: McpToolName): unknown {
     name,
     title: name,
     description: `Read-only Retrospec tool: ${name}`,
-    inputSchema: { type: "object", properties: {}, additionalProperties: true },
+    inputSchema: toolInputSchema(name),
   }
+}
+
+function toolInputSchema(name: McpToolName): unknown {
+  if (name === "retrospec_status") {
+    return {
+      type: "object",
+      properties: {
+        project_path: {
+          type: "string",
+          description: "Absolute path to the project whose Retrospec status should be read.",
+        },
+      },
+      required: ["project_path"],
+      additionalProperties: false,
+    }
+  }
+
+  if (name === "retrospec_explore") {
+    return {
+      type: "object",
+      properties: {
+        project_path: {
+          type: "string",
+          description: "Absolute path to the project whose Retrospec state should be explored.",
+        },
+        anchor: {
+          type: "string",
+          description:
+            "Entity, symbol, table, file, or concept name to explore from Retrospec state.",
+        },
+        depth: {
+          type: "integer",
+          description: "Traversal depth from 1 to 4. Defaults to 1.",
+          minimum: 1,
+          maximum: 4,
+          default: 1,
+        },
+      },
+      required: ["project_path", "anchor"],
+      additionalProperties: false,
+    }
+  }
+
+  return { type: "object", properties: {}, additionalProperties: false }
 }
 
 function jsonRpcResult(id: McpRequestId, result: unknown): McpJsonRpcResponse {
