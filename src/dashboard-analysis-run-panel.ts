@@ -106,6 +106,10 @@ function renderProviderSettings(settings: SpecProviderSettings): string {
                 <span>Base URL</span>
                 <input name="provider_base_url" value="${escapeHtml(baseUrlValue(settings))}" placeholder="https://api.openai.com/v1">
               </label>
+              <label class="provider-field" data-provider-visible-modes="env-provider">
+                <span>API key</span>
+                <input name="provider_api_key" type="password" autocomplete="off" placeholder="${escapeHtml(apiKeyPlaceholder(settings))}">
+              </label>
               <label class="provider-field" data-provider-visible-modes="opencode-broker">
                 <span>Broker URL</span>
                 <input name="broker_url" value="${escapeHtml(brokerUrlValue(settings))}" placeholder="http://127.0.0.1:9000">
@@ -184,12 +188,30 @@ function brokerUrlValue(settings: SpecProviderSettings): string {
   }
 }
 
+function apiKeyPlaceholder(settings: SpecProviderSettings): string {
+  switch (settings.mode) {
+    case "deterministic":
+    case "opencode-broker":
+      return "sk-..."
+    case "env-provider":
+      return settings.hasApiKey ? "••••••••" : "sk-..."
+    default:
+      return assertNever(settings)
+  }
+}
+
 export function providerSettingsSummary(settings: SpecProviderSettings): string {
   switch (settings.mode) {
     case "deterministic":
       return "deterministic"
     case "env-provider":
-      return [settings.mode, settings.provider, settings.model, settings.baseUrl]
+      return [
+        settings.mode,
+        settings.provider,
+        settings.model,
+        settings.baseUrl,
+        settings.hasApiKey ? "API key saved: ••••••••" : "API key not saved",
+      ]
         .filter((value): value is string => value !== undefined)
         .join(" · ")
     case "opencode-broker":

@@ -120,12 +120,34 @@ OpenCode agent에게 맡기는 경우에는 이렇게 요청해도 됩니다.
 
 ### 2. 분석할 프로젝트에서 상태 확인
 
+먼저 Retrospec daemon을 백그라운드로 실행해 둡니다.
+
+#### Windows
+
+Windows 환경에서는 현재 `retrospec status .`가 자동으로 띄운 daemon이 부모 프로세스 종료와 함께 바로 꺼지는 이슈가 있습니다. 먼저 daemon을 실행한 뒤 상태를 확인하는 방식을 권장합니다.
+
+```cmd
+# daemon 실행
+retrospec daemon
+
+# 백그라운드로 daemon 실행
+start /B retrospec daemon
+```
+
+#### macOS/Linux
+
+macOS/Linux에서는 `retrospec status .`가 daemon이 없는 경우 자동으로 띄우므로 이 단계를 생략해도 됩니다. 동일하게 `retrospec daemon` 명령으로 직접 띄울 수 있습니다.
+
+그다음 분석할 프로젝트에서 상태를 확인합니다.
+
 ```bash
 cd /path/to/your/project
 retrospec status .
 ```
 
-직접 daemon을 먼저 띄우지 않아도 됩니다. `retrospec status .`는 사용할 daemon이 없거나 현재 버전과 맞지 않으면 daemon을 시작하려고 시도합니다. foreground에서 daemon을 유지하고 싶을 때만 `retrospec daemon`을 따로 실행하세요. 이미 오래된 daemon이 살아 있거나 다른 workspace를 잡고 있으면 현재 daemon endpoint를 종료한 뒤 새 daemon으로 교체합니다.
+`retrospec status .`는 사용할 daemon이 없거나 현재 버전과 맞지 않으면 daemon 자동 시작을 시도합니다. 이미 오래된 daemon이 살아 있거나 다른 workspace를 잡고 있으면 현재 daemon endpoint를 종료한 뒤 새 daemon으로 교체합니다.
+
+상태 확인이 끝나면 OpenCode를 실행하고 Retrospec agent가 정상적으로 보이는지 확인하세요.
 
 #### 버전 업데이트 시 유의사항
 

@@ -110,18 +110,34 @@ For agent-driven setup and daemon recovery, point the agent to [`docs/agent-inst
 
 ### 2. Start from the project
 
+Start the Retrospec daemon in the background first.
+
+#### Windows
+
+On Windows, the current `retrospec status .` auto-started daemon can exit as soon as the parent process exits. We recommend starting the daemon first, then checking status from the target project.
+
+```cmd
+# Start daemon
+retrospec daemon
+
+# Start daemon in the background
+start /B retrospec daemon
+```
+
+#### macOS/Linux
+
+On macOS/Linux, `retrospec status .` starts the daemon automatically when no daemon is running, so you can usually skip this step. You can also start it directly with `retrospec daemon`.
+
+Then check status from the project you want to analyze.
+
 ```bash
 cd /path/to/your/project
 retrospec status .
 ```
 
-You do not have to start the daemon manually first. `retrospec status .` tries to start a daemon when no usable daemon exists or when the existing daemon does not match the current CLI version. If an old daemon is recorded for another workspace, Retrospec shuts down that endpoint with the current runtime token and makes the new daemon current.
+`retrospec status .` tries to start a daemon when no usable daemon exists or when the existing daemon does not match the current CLI version. If an old daemon is recorded for another workspace, Retrospec shuts down that endpoint with the current runtime token and makes the new daemon current.
 
-If you prefer to keep the daemon in the foreground:
-
-```bash
-retrospec daemon
-```
+After the status check, launch OpenCode and confirm that the Retrospec agents are available.
 
 ### Upgrade caution
 

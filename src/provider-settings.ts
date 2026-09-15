@@ -11,6 +11,25 @@ export const specProviderSettingsSchema = z.discriminatedUnion("mode", [
     provider: z.string().min(1),
     model: z.string().min(1),
     baseUrl: z.string().url().optional(),
+    hasApiKey: z.boolean().default(false),
+    secretSource: z.literal("env").default("env"),
+  }),
+  z.object({
+    mode: z.literal("opencode-broker"),
+    model: z.string().min(1),
+    brokerUrl: z.string().url(),
+    secretSource: z.literal("env").default("env"),
+  }),
+])
+
+export const specProviderSettingsInputSchema = z.discriminatedUnion("mode", [
+  z.object({ mode: z.literal("deterministic"), secretSource: z.literal("env").default("env") }),
+  z.object({
+    mode: z.literal("env-provider"),
+    provider: z.string().min(1),
+    model: z.string().min(1),
+    baseUrl: z.string().url().optional(),
+    apiKey: z.string().min(1).optional(),
     secretSource: z.literal("env").default("env"),
   }),
   z.object({
@@ -22,7 +41,7 @@ export const specProviderSettingsSchema = z.discriminatedUnion("mode", [
 ])
 
 export type SpecProviderSettings = z.infer<typeof specProviderSettingsSchema>
-export type SpecProviderSettingsInput = z.input<typeof specProviderSettingsSchema>
+export type SpecProviderSettingsInput = z.input<typeof specProviderSettingsInputSchema>
 
 export type SavedSpecProviderSettings = {
   readonly settings: SpecProviderSettings
@@ -42,8 +61,13 @@ type SpecProviderSettingsRow = {
   readonly model: string | null
   readonly base_url: string | null
   readonly broker_url: string | null
+  readonly api_key: string | null
   readonly secret_source: "env"
   readonly updated_at: string
+}
+
+type SpecProviderApiKeyRow = {
+  readonly api_key: string | null
 }
 
 const providerSettingsKey = "default"
@@ -53,21 +77,28 @@ export async function writeSpecProviderSettings(
   input: SpecProviderSettingsInput,
 ): Promise<SavedSpecProviderSettings> {
   await ensureProjectRegistry(paths)
-  const settings = specProviderSettingsSchema.parse(input)
+  const parsedInput = specProviderSettingsInputSchema.parse(input)
   const updatedAt = new Date().toISOString()
   const db = new Database(paths.registryDb, { create: true })
 
   try {
+    const existingKey = readStoredApiKey(db)
+    const apiKey = apiKeyColumn(parsedInput, existingKey)
+    const settings = specProviderSettingsSchema.parse({
+      ...parsedInput,
+      hasApiKey: apiKey !== null,
+    })
     db.query(
       `insert into spec_provider_settings
-         (settings_key, mode, provider, model, base_url, broker_url, secret_source, updated_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?)
+         (settings_key, mode, provider, model, base_url, broker_url, api_key, secret_source, updated_at)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?)
        on conflict(settings_key) do update set
          mode = excluded.mode,
          provider = excluded.provider,
          model = excluded.model,
          base_url = excluded.base_url,
          broker_url = excluded.broker_url,
+         api_key = excluded.api_key,
          secret_source = excluded.secret_source,
          updated_at = excluded.updated_at`,
     ).run(
@@ -77,14 +108,14 @@ export async function writeSpecProviderSettings(
       modelColumn(settings),
       baseUrlColumn(settings),
       brokerUrlColumn(settings),
+      apiKey,
       settings.secretSource,
       updatedAt,
     )
+    return { settings, updatedAt }
   } finally {
     db.close()
   }
-
-  return { settings, updatedAt }
 }
 
 export async function readSpecProviderSettings(
@@ -96,7 +127,7 @@ export async function readSpecProviderSettings(
   try {
     const row = db
       .query<SpecProviderSettingsRow, [string]>(
-        `select mode, provider, model, base_url, broker_url, secret_source, updated_at
+        `select mode, provider, model, base_url, broker_url, api_key, secret_source, updated_at
          from spec_provider_settings
          where settings_key = ?`,
       )
@@ -105,6 +136,17 @@ export async function readSpecProviderSettings(
       return null
     }
     return { settings: specProviderSettingsFromRow(row), updatedAt: row.updated_at }
+  } finally {
+    db.close()
+  }
+}
+
+export async function readSpecProviderApiKey(paths: ProjectPaths): Promise<string | null> {
+  await ensureProjectRegistry(paths)
+  const db = new Database(paths.registryDb, { readonly: true })
+
+  try {
+    return readStoredApiKey(db)
   } finally {
     db.close()
   }
@@ -139,6 +181,7 @@ function specProviderSettingsFromRow(row: SpecProviderSettingsRow): SpecProvider
         provider: row.provider,
         model: row.model,
         ...(row.base_url !== null ? { baseUrl: row.base_url } : {}),
+        hasApiKey: row.api_key !== null,
         secretSource: row.secret_source,
       })
     case "opencode-broker":
@@ -199,6 +242,28 @@ function brokerUrlColumn(settings: SpecProviderSettings): string | null {
     default:
       return assertNever(settings)
   }
+}
+
+function apiKeyColumn(input: SpecProviderSettingsInput, existingKey: string | null): string | null {
+  switch (input.mode) {
+    case "deterministic":
+    case "opencode-broker":
+      return null
+    case "env-provider":
+      return input.apiKey ?? existingKey
+    default:
+      return assertNever(input)
+  }
+}
+
+function readStoredApiKey(db: Database): string | null {
+  return (
+    db
+      .query<SpecProviderApiKeyRow, [string]>(
+        "select api_key from spec_provider_settings where settings_key = ?",
+      )
+      .get(providerSettingsKey)?.api_key ?? null
+  )
 }
 
 function assertNever(value: never): never {

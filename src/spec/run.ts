@@ -1,6 +1,6 @@
 import type { AnalysisLaunchControls } from "../analysis-launch-controls"
 import { loadSpecProviderConfig } from "../config"
-import { readSpecProviderSettings } from "../provider-settings"
+import { readSpecProviderApiKey, readSpecProviderSettings } from "../provider-settings"
 import {
   type SpecAnalysisDriver,
   SpecAnalysisDriverError,
@@ -66,7 +66,10 @@ export async function runSpecAnalysis(
 
 async function selectSavedSpecAnalysisDriver(paths: ProjectPaths): Promise<SpecAnalysisDriver> {
   const saved = await readSpecProviderSettings(paths)
-  return selectSpecAnalysisDriver(loadSpecProviderConfig(process.env, saved?.settings ?? null))
+  const savedApiKey = await readSpecProviderApiKey(paths)
+  return selectSpecAnalysisDriver(
+    loadSpecProviderConfig(process.env, saved?.settings ?? null, savedApiKey ?? undefined),
+  )
 }
 
 function isSpecAnalysisDriver(

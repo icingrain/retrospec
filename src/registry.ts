@@ -71,6 +71,7 @@ export function bootstrapProjectRegistry(paths: ProjectPaths): void {
           model text,
           base_url text,
           broker_url text,
+          api_key text,
           secret_source text not null default 'env',
           updated_at text not null
         );
@@ -111,6 +112,7 @@ function ensureRegistryColumns(db: Database): void {
     "batch_size integer not null default 50",
     "worker_count integer not null default 2",
   ])
+  ensureColumns(db, "spec_provider_settings", ["api_key text"])
 }
 
 function ensureColumns(db: Database, table: string, definitions: readonly string[]): void {

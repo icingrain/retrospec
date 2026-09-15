@@ -126,7 +126,8 @@ function renderLaunchScript(): string {
 		                if (mode === "env-provider") {
 		                  const provider = textValue("provider_name") || "openai";
 		                  const baseUrl = textValue("provider_base_url");
-		                  return { mode: "env-provider", provider, model, ...(baseUrl ? { baseUrl } : {}) };
+		                  const apiKey = textValue("provider_api_key");
+		                  return { mode: "env-provider", provider, model, ...(baseUrl ? { baseUrl } : {}), ...(apiKey ? { apiKey } : {}) };
 		                }
 		                if (mode === "opencode-broker") {
 		                  return { mode: "opencode-broker", model: model || "openai/gpt-5.5", brokerUrl: textValue("broker_url") || "http://127.0.0.1:9000" };
@@ -147,9 +148,11 @@ function renderLaunchScript(): string {
 		                }
 		                const result = await response.json();
 		                providerStatus.textContent = describeProviderSettings(result.settings);
+		                const apiKeyInput = root.querySelector('[name="provider_api_key"]');
+		                if (apiKeyInput) apiKeyInput.value = "";
 		              };
 		              const describeProviderSettings = (settings) => {
-		                if (settings.mode === "env-provider") return [settings.mode, settings.provider, settings.model, settings.baseUrl].filter(Boolean).join(" · ");
+		                if (settings.mode === "env-provider") return [settings.mode, settings.provider, settings.model, settings.baseUrl, settings.hasApiKey ? "API key saved: ••••••••" : "API key not saved"].filter(Boolean).join(" · ");
 		                if (settings.mode === "opencode-broker") return [settings.mode, settings.model, settings.brokerUrl].join(" · ");
 		                return "deterministic";
 		              };

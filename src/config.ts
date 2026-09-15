@@ -64,6 +64,7 @@ type SpecProviderEnvFields = {
 export function loadSpecProviderConfig(
   env: NodeJS.ProcessEnv = process.env,
   settings?: SpecProviderSettings | null,
+  savedApiKey?: string,
 ): SpecProviderConfig {
   const parsed = providerEnvSchema.parse(env)
   const fields: SpecProviderEnvFields = {
@@ -75,7 +76,10 @@ export function loadSpecProviderConfig(
     brokerToken: parsed.RETROSPEC_SPEC_BROKER_TOKEN,
   }
   if (settings !== undefined && settings !== null) {
-    return loadSavedSpecProviderConfig(settings, fields)
+    return loadSavedSpecProviderConfig(settings, {
+      ...fields,
+      apiKey: savedApiKey ?? fields.apiKey,
+    })
   }
   const providerMode = parsed.RETROSPEC_SPEC_PROVIDER_MODE
   const resolvedMode = providerMode ?? inferSpecProviderMode(fields)

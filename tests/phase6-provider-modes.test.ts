@@ -2,6 +2,7 @@ import { Database } from "bun:sqlite"
 import { describe, expect, test } from "bun:test"
 import { loadSpecProviderConfig } from "../src/config"
 import { projectPaths } from "../src/paths"
+import { writeSpecProviderSettings } from "../src/provider-settings"
 import { runRetroInventory } from "../src/retro/run"
 import { selectSpecAnalysisDriver } from "../src/spec-analysis"
 import { runSpecAnalysis } from "../src/spec/run"
@@ -60,6 +61,68 @@ describe("Phase 6 provider execution modes", () => {
       }
     } finally {
       server.stop(true)
+    }
+  })
+
+  test("Given saved env provider API key When config is loaded Then saved key is preferred over environment fallback", () => {
+    const config = loadSpecProviderConfig(
+      {
+        RETROSPEC_SPEC_PROVIDER: "openai",
+        RETROSPEC_SPEC_MODEL: "gpt-env",
+        RETROSPEC_SPEC_API_KEY: "env-secret-key",
+      },
+      {
+        mode: "env-provider",
+        provider: "openai",
+        model: "gpt-saved",
+        baseUrl: "https://api.saved.example/v1",
+        hasApiKey: true,
+        secretSource: "env",
+      },
+      "saved-secret-key",
+    )
+
+    expect(config).toEqual({
+      mode: "env-provider",
+      provider: "openai",
+      model: "gpt-saved",
+      apiKey: "saved-secret-key",
+      baseUrl: "https://api.saved.example/v1",
+    })
+  })
+
+  test("Given saved env provider settings When spec analysis runs Then saved API key authorizes provider requests", async () => {
+    const previousApiKey = process.env["RETROSPEC_SPEC_API_KEY"]
+    Reflect.deleteProperty(process.env, "RETROSPEC_SPEC_API_KEY")
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        expect(request.headers.get("authorization")).toBe("Bearer saved-secret-key")
+        return Response.json({
+          choices: [{ message: { content: JSON.stringify({ findings: [] }) } }],
+        })
+      },
+    })
+
+    try {
+      const projectRoot = await tempProject()
+      await writeSampleProject(projectRoot)
+      await runRetroInventory(projectRoot)
+      const paths = projectPaths(projectRoot)
+      await writeSpecProviderSettings(paths, {
+        mode: "env-provider",
+        provider: "openai",
+        model: "gpt-saved-run",
+        baseUrl: `${server.url}v1`,
+        apiKey: "saved-secret-key",
+      })
+
+      const result = await runSpecAnalysis(paths)
+
+      expect(result.findingCount).toBe(0)
+    } finally {
+      server.stop(true)
+      restoreEnv("RETROSPEC_SPEC_API_KEY", previousApiKey)
     }
   })
 
@@ -161,3 +224,11 @@ describe("Phase 6 provider execution modes", () => {
     ).toThrow("opencode-broker config requires RETROSPEC_SPEC_BROKER_URL")
   })
 })
+
+function restoreEnv(name: string, value: string | undefined): void {
+  if (value === undefined) {
+    Reflect.deleteProperty(process.env, name)
+    return
+  }
+  process.env[name] = value
+}

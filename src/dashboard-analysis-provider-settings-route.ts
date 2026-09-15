@@ -5,13 +5,13 @@ import { readBrokerHealth } from "./provider-health"
 import {
   readSpecProviderSettings,
   resolveSpecProviderSettingsState,
-  specProviderSettingsSchema,
+  specProviderSettingsInputSchema,
   writeSpecProviderSettings,
 } from "./provider-settings"
 
 const providerSettingsRequestSchema = z.object({
   project_path: z.string().min(1),
-  settings: specProviderSettingsSchema,
+  settings: specProviderSettingsInputSchema,
 })
 
 export function registerDashboardAnalysisProviderSettingsRoute(app: Hono): void {
