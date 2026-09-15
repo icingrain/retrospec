@@ -214,6 +214,10 @@ Dashboard는 daemon health, 등록 프로젝트, job ledger, analysis status, pr
 
 Dashboard export 화면은 GraphML/Cypher/Mermaid 파일을 내려받기 전에 가벼운 preview를 보여줍니다.
 
+![Retrospec GraphML export opened in Gephi](git-readme/graphml_gephi.png)
+
+Retrospec Agent로 추출한 GraphML 파일을 Gephi로 시각화한 예시입니다.
+
 ### MCP 지원
 
 Retrospec daemon은 read-only `/mcp` JSON-RPC endpoint를 제공합니다.
