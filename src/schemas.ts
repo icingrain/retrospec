@@ -11,6 +11,9 @@ const analysisLaunchSettingsSchema = z.object({
   exclude_extensions: z.array(z.string()).optional(),
   batch_size: z.number().int().min(1).max(1_000).optional(),
   worker_count: z.number().int().min(1).max(1_000).optional(),
+  spec_template: z
+    .union([z.literal("risk"), z.literal("migration"), z.literal("summary")])
+    .optional(),
 })
 
 export const healthResponseSchema = z.object({
@@ -89,6 +92,15 @@ export const submitJobResponseSchema = z.object({
     z.literal("cancelled"),
   ]),
   replaced_job_id: z.string().startsWith("job_").optional(),
+})
+
+export const activeJobConflictResponseSchema = z.object({
+  error: z.string(),
+  conflict: z.object({
+    job_id: z.string().startsWith("job_"),
+    status: z.union([z.literal("queued"), z.literal("running")]),
+    write_scope_key: z.string(),
+  }),
 })
 
 export { analysisLaunchSettingsSchema, analysisScopeSchema }

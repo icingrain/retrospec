@@ -60,7 +60,6 @@ export const upgradeCallGraph: CallGraphInput = {
       callee_name: "run",
       file_path: "src/Main.java",
       line: 4,
-      confidence: 0.4,
       confidence_label: "AMBIGUOUS",
     },
   ],
@@ -141,19 +140,17 @@ export async function seedOldCallGraphDb(stateDir: string): Promise<void> {
       create table calls (
         caller_entity_id text not null,
         callee_entity_id text,
-        callee_name text not null,
-        file_path text not null,
-        line integer not null,
-        confidence real not null,
-        confidence_label text not null
+	        callee_name text not null,
+	        file_path text not null,
+	        line integer not null,
+	        confidence_label text not null
       );
       create table sequence_candidates (
         sequence_id text primary key,
-        root_entity_id text not null,
-        participant_entity_ids text not null,
-        call_path text not null,
-        confidence real not null,
-        reason text
+	        root_entity_id text not null,
+	        participant_entity_ids text not null,
+	        call_path text not null,
+	        reason text
       );
       create table graph_communities (
         community_id text not null,

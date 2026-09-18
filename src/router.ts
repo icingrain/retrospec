@@ -1,6 +1,7 @@
 import { existsSync } from "node:fs"
 import { analysisStatus, registerProjectWithDaemon } from "./client"
 import { ensureDaemon, health } from "./discovery"
+import { syncRetrospecMcpEndpoint } from "./opencode-mcp-sync"
 import { projectPaths, runtimePaths } from "./paths"
 import type { RouterSummary, RuntimePaths } from "./types"
 
@@ -10,6 +11,7 @@ export async function routerSummary(
 ): Promise<RouterSummary> {
   const paths = projectPaths(projectRoot)
   const endpoint = await ensureDaemon(runtime)
+  await syncRetrospecMcpEndpoint(paths.projectRoot, endpoint)
   const daemon = await health(endpoint)
 
   if (daemon === null) {

@@ -64,7 +64,6 @@ export const specBatchInputSchema = z.object({
       entityId: z.string(),
       glossaryType: z.string(),
       glossaryKey: z.string(),
-      confidence: z.number(),
     }),
   ),
 })

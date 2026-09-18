@@ -12,7 +12,6 @@ type CallRow = {
   readonly caller_entity_id: string
   readonly callee_entity_id: string | null
   readonly callee_name: string
-  readonly confidence: number
   readonly confidence_label: CallConfidenceLabel
 }
 
@@ -41,8 +40,8 @@ function readGraphExportInput(paths: ProjectPaths): GraphExportInput {
   try {
     const calls = db
       .query<CallRow, []>(
-        `select caller_entity_id, callee_entity_id, callee_name, confidence, confidence_label
-         from calls
+        `select caller_entity_id, callee_entity_id, callee_name, confidence_label
+	         from calls
          order by caller_entity_id, callee_entity_id, callee_name`,
       )
       .all()
@@ -85,10 +84,9 @@ function renderGraphml(calls: readonly CallRow[]): string {
     .map(
       (call) =>
         `    <edge source="${xmlEscape(call.caller_entity_id)}" target="${xmlEscape(call.callee_entity_id ?? "")}">
-      <data key="callee_name">${xmlEscape(call.callee_name)}</data>
-      <data key="confidence">${call.confidence}</data>
-      <data key="confidence_label">${call.confidence_label}</data>
-    </edge>`,
+	      <data key="callee_name">${xmlEscape(call.callee_name)}</data>
+	      <data key="confidence_label">${call.confidence_label}</data>
+	    </edge>`,
     )
     .join("\n")
   return `<?xml version="1.0" encoding="UTF-8"?>\n<graphml xmlns="http://graphml.graphdrawing.org/xmlns">\n  <graph edgedefault="directed">\n${nodes}\n${edges}\n  </graph>\n</graphml>\n`
@@ -101,7 +99,7 @@ function renderCypher(calls: readonly CallRow[]): string {
       (call) =>
         `MERGE (caller:Entity {id: '${cypherEscape(call.caller_entity_id)}'})\n` +
         `MERGE (callee:Entity {id: '${cypherEscape(call.callee_entity_id ?? "")}'})\n` +
-        `MERGE (caller)-[:CALLS {confidence: ${call.confidence}, label: '${call.confidence_label}'}]->(callee);`,
+        `MERGE (caller)-[:CALLS {label: '${call.confidence_label}'}]->(callee);`,
     )
     .join("\n")
 }

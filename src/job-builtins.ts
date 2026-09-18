@@ -60,8 +60,8 @@ export async function runBuiltInSpecAnalysis(
   jobId: JobId,
   manifest: BuiltInJobManifest,
 ): Promise<void> {
-  if (manifest.actor !== "spec" || manifest.category !== "risk") {
-    throw new Error("ai-analysis capability requires spec risk category")
+  if (manifest.actor !== "spec") {
+    throw new Error("ai-analysis capability requires spec actor")
   }
 
   try {

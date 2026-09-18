@@ -43,9 +43,7 @@ describe("Phase 5 graph exports", () => {
     const cypher = await readFile(join(paths.exportsDir, "call_graph.cypher"), "utf8")
 
     expect(cypher).toContain("MERGE (caller:Entity {id: 'sym_controller'})")
-    expect(cypher).toContain(
-      "MERGE (caller)-[:CALLS {confidence: 0.99, label: 'EXTRACTED'}]->(callee);",
-    )
+    expect(cypher).toContain("MERGE (caller)-[:CALLS {label: 'EXTRACTED'}]->(callee);")
   })
 
   test("Given sequence candidates When Mermaid export is requested Then sequence diagram source is written", async () => {
@@ -96,7 +94,6 @@ async function seedGraphProject() {
         callee_name: "createOrder",
         file_path: "src/controller.ts",
         line: 14,
-        confidence: 0.99,
         confidence_label: "EXTRACTED",
       },
     ],
@@ -106,7 +103,6 @@ async function seedGraphProject() {
         root_entity_id: "sym_controller",
         participant_entity_ids: ["sym_controller", "sym_service"],
         call_path: ["sym_controller", "sym_service"],
-        confidence: 0.82,
         reason: "controller-to-service happy path has extracted evidence",
       },
     ],

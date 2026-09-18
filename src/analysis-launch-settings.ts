@@ -18,6 +18,7 @@ type AnalysisLaunchSettingsRow = {
   readonly exclude_extensions_json: string
   readonly batch_size: number
   readonly worker_count: number
+  readonly spec_template: "risk" | "migration" | "summary"
   readonly updated_at: string
 }
 
@@ -34,8 +35,8 @@ export async function writeAnalysisLaunchSettings(
   try {
     db.query(
       `insert into analysis_launch_settings
-         (settings_key, scope_mode, scope_roots_json, exclude_folders_json, exclude_extensions_json, batch_size, worker_count, updated_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?)
+         (settings_key, scope_mode, scope_roots_json, exclude_folders_json, exclude_extensions_json, batch_size, worker_count, spec_template, updated_at)
+       values (?, ?, ?, ?, ?, ?, ?, ?, ?)
        on conflict(settings_key) do update set
          scope_mode = excluded.scope_mode,
          scope_roots_json = excluded.scope_roots_json,
@@ -43,6 +44,7 @@ export async function writeAnalysisLaunchSettings(
          exclude_extensions_json = excluded.exclude_extensions_json,
          batch_size = excluded.batch_size,
          worker_count = excluded.worker_count,
+         spec_template = excluded.spec_template,
          updated_at = excluded.updated_at`,
     ).run(
       analysisLaunchSettingsKey,
@@ -52,6 +54,7 @@ export async function writeAnalysisLaunchSettings(
       JSON.stringify(normalized.excludeExtensions),
       normalized.batchSize,
       normalized.workerCount,
+      normalized.specTemplate,
       updatedAt,
     )
   } finally {
@@ -69,7 +72,7 @@ export async function readAnalysisLaunchSettings(
     const row = db
       .query<AnalysisLaunchSettingsRow, [string]>(
         `select scope_mode, scope_roots_json, exclude_folders_json, exclude_extensions_json,
-                batch_size, worker_count, updated_at
+                batch_size, worker_count, spec_template, updated_at
          from analysis_launch_settings
          where settings_key = ?`,
       )
@@ -84,6 +87,7 @@ export async function readAnalysisLaunchSettings(
         excludeExtensions: parseStringArray(row.exclude_extensions_json),
         batchSize: row.batch_size,
         workerCount: row.worker_count,
+        specTemplate: row.spec_template,
       }),
       updated_at: row.updated_at,
     }

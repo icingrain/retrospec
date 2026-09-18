@@ -4,9 +4,18 @@ import { fileURLToPath } from "node:url"
 import { z } from "zod"
 import { loadRetrospecAgentModelConfig } from "./config"
 import { retrospecConfigDefaults } from "./opencode-defaults"
+import { mergeRetrospecMcpConfig, retrospecMcpServerName } from "./opencode-install-mcp"
+import {
+  type InstallModelSelectionOptions,
+  applyInstallModelEnv,
+  resolveInstallModel,
+} from "./opencode-install-model"
 
 const opencodeConfigSchema = z.object({
   agent: z.record(z.unknown()).optional(),
+  mcp: z.record(z.unknown()).optional(),
+  model: z.string().min(1).optional(),
+  provider: z.record(z.unknown()).optional(),
 })
 
 const retrospecRoot = fileURLToPath(new URL("..", import.meta.url))
@@ -100,16 +109,22 @@ export type InstallRetrospecOpenCodeConfigResult = {
   readonly configPath: string
   readonly pluginPath: string
   readonly addedAgents: readonly string[]
+  readonly agentModel: string
+  readonly mcpServer: string
 }
+
+export type InstallRetrospecOpenCodeConfigOptions = InstallModelSelectionOptions
 
 export async function installRetrospecOpenCodeConfig(
   projectRoot: string,
   env: NodeJS.ProcessEnv = process.env,
+  options: InstallRetrospecOpenCodeConfigOptions = {},
 ): Promise<InstallRetrospecOpenCodeConfigResult> {
   const configPath = join(projectRoot, ".opencode", "opencode.jsonc")
   const pluginPath = join(projectRoot, retrospecAgentOrderPluginPath)
   const config = await readOpenCodeConfig(configPath)
-  const agentConfig = loadRetrospecAgentModelConfig(env)
+  const installModel = await resolveInstallModel(config, env, options)
+  const agentConfig = loadRetrospecAgentModelConfig(applyInstallModelEnv(env, installModel))
   const existingAgents = toAgentRecord(config.agent)
   const addedAgents: string[] = []
 
@@ -131,14 +146,25 @@ export async function installRetrospecOpenCodeConfig(
   await writeFile(
     configPath,
     `${JSON.stringify(
-      { ...config, agent: existingAgents, retrospec: createRetrospecConfig(config["retrospec"]) },
+      {
+        ...config,
+        agent: existingAgents,
+        mcp: mergeRetrospecMcpConfig(config.mcp),
+        retrospec: createRetrospecConfig(config["retrospec"]),
+      },
       null,
       2,
     )}\n`,
   )
   await writeFile(pluginPath, retrospecAgentOrderPlugin)
 
-  return { configPath, pluginPath, addedAgents }
+  return {
+    configPath,
+    pluginPath,
+    addedAgents,
+    agentModel: agentConfig.defaultModel,
+    mcpServer: retrospecMcpServerName,
+  }
 }
 
 async function readOpenCodeConfig(configPath: string): Promise<OpenCodeConfig> {

@@ -21,8 +21,8 @@ export async function writeMigrationGroups(
   try {
     const insert = db.query(
       `insert or replace into migration_groups
-       (group_id, analysis_run_id, title, priority, summary, evidence_label, confidence, source_anchor_json, created_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	       (group_id, analysis_run_id, title, priority, summary, evidence_label, source_anchor_json, created_at)
+	       values (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
 
     for (const group of groups) {
@@ -33,7 +33,6 @@ export async function writeMigrationGroups(
         group.priority,
         group.summary,
         group.evidenceLabel ?? "INFERRED",
-        group.confidence ?? null,
         stringifySourceAnchor(group.sourceAnchor),
         createdAt,
       )
@@ -55,8 +54,8 @@ export async function writeMigrationFindings(
   try {
     const insert = db.query(
       `insert or replace into migration_findings
-       (finding_id, analysis_run_id, entity_id, file_path, group_id, migration_type, priority, summary, recommendation, evidence_label, confidence, source_anchor_json, created_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	       (finding_id, analysis_run_id, entity_id, file_path, group_id, migration_type, priority, summary, recommendation, evidence_label, source_anchor_json, created_at)
+	       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
 
     for (const finding of findings) {
@@ -71,7 +70,6 @@ export async function writeMigrationFindings(
         finding.summary,
         finding.recommendation,
         finding.evidenceLabel ?? "INFERRED",
-        finding.confidence ?? null,
         stringifySourceAnchor(finding.sourceAnchor),
         createdAt,
       )
@@ -93,8 +91,8 @@ export async function writeSummarySections(
   try {
     const insert = db.query(
       `insert or replace into summary_sections
-       (section_id, analysis_run_id, entity_id, file_path, title, body, rank, evidence_label, confidence, source_anchor_json, created_at)
-       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	       (section_id, analysis_run_id, entity_id, file_path, title, body, rank, evidence_label, source_anchor_json, created_at)
+	       values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
 
     for (const section of sections) {
@@ -107,7 +105,6 @@ export async function writeSummarySections(
         section.body,
         section.rank,
         section.evidenceLabel ?? "INFERRED",
-        section.confidence ?? null,
         stringifySourceAnchor(section.sourceAnchor),
         createdAt,
       )

@@ -87,18 +87,20 @@ function renderLaunchScript(): string {
 		              const describeScope = (scope) => scope.mode === "partial" ? scope.roots.join(", ") : "Full project";
 		              const describeExecutionSettings = (settings) => "batch " + settings.batchSize + " · workers " + settings.workerCount;
 		              const listValue = (name) => root.querySelector('[name="' + name + '"]')?.value.split(/[\\n,]/).map((item) => item.trim()).filter(Boolean) ?? [];
-	              const numberValue = (name, fallback) => {
-	                const raw = root.querySelector('[name="' + name + '"]')?.value.trim() ?? "";
-	                const parsed = Number.parseInt(raw, 10);
-	                return Number.isInteger(parsed) ? parsed : fallback;
-	              };
-	              const currentLaunchSettings = () => ({
-	                scope: currentScope(),
-	                exclude_folders: listValue("exclude_folders"),
-	                exclude_extensions: listValue("exclude_extensions"),
-	                batch_size: numberValue("batch_size", 50),
-	                worker_count: numberValue("worker_count", 2),
-	              });
+		              const numberValue = (name, fallback) => {
+		                const raw = root.querySelector('[name="' + name + '"]')?.value.trim() ?? "";
+		                const parsed = Number.parseInt(raw, 10);
+		                return Number.isInteger(parsed) ? parsed : fallback;
+		              };
+		              const selectedSpecTemplate = () => root.querySelector('input[name="spec_template"]:checked')?.value ?? "risk";
+		              const currentLaunchSettings = () => ({
+		                scope: currentScope(),
+		                exclude_folders: listValue("exclude_folders"),
+		                exclude_extensions: listValue("exclude_extensions"),
+		                batch_size: numberValue("batch_size", 50),
+		                worker_count: numberValue("worker_count", 2),
+		                spec_template: selectedSpecTemplate(),
+		              });
 	              const saveScope = async () => {
 	                if (!projectPath || !savedStatus) return;
 	                const scope = currentScope();

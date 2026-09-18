@@ -22,6 +22,7 @@ export function registerDashboardAnalysisLaunchSettingsRoute(app: Hono): void {
       excludeExtensions: request.settings.exclude_extensions,
       batchSize: request.settings.batch_size,
       workerCount: request.settings.worker_count,
+      specTemplate: request.settings.spec_template,
     })
     return c.json(settings)
   })

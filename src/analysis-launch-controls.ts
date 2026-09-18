@@ -2,12 +2,15 @@ import { isAbsolute, normalize, sep } from "node:path"
 import { fullAnalysisScope, normalizeAnalysisScope } from "./analysis-scope"
 import type { AnalysisScope } from "./analysis-scope"
 
+export type SpecTemplateName = "risk" | "migration" | "summary"
+
 export type AnalysisLaunchControls = {
   readonly scope: AnalysisScope
   readonly excludeFolders: readonly string[]
   readonly excludeExtensions: readonly string[]
   readonly batchSize: number
   readonly workerCount: number
+  readonly specTemplate: SpecTemplateName
 }
 
 export type AnalysisLaunchControlsInput = {
@@ -16,6 +19,7 @@ export type AnalysisLaunchControlsInput = {
   readonly excludeExtensions?: readonly string[] | undefined
   readonly batchSize?: number | undefined
   readonly workerCount?: number | undefined
+  readonly specTemplate?: SpecTemplateName | undefined
 }
 
 export const defaultAnalysisLaunchControls: AnalysisLaunchControls = {
@@ -24,6 +28,7 @@ export const defaultAnalysisLaunchControls: AnalysisLaunchControls = {
   excludeExtensions: [],
   batchSize: 50,
   workerCount: 2,
+  specTemplate: "risk",
 }
 
 export function normalizeAnalysisLaunchControls(
@@ -37,6 +42,7 @@ export function normalizeAnalysisLaunchControls(
     workerCount: normalizeBoundedInteger(
       input.workerCount ?? defaultAnalysisLaunchControls.workerCount,
     ),
+    specTemplate: input.specTemplate ?? defaultAnalysisLaunchControls.specTemplate,
   }
 }
 
@@ -46,6 +52,7 @@ export function toLaunchSettingsPayload(controls: AnalysisLaunchControls): {
   readonly exclude_extensions: readonly string[]
   readonly batch_size: number
   readonly worker_count: number
+  readonly spec_template: SpecTemplateName
 } {
   return {
     scope: controls.scope,
@@ -53,6 +60,7 @@ export function toLaunchSettingsPayload(controls: AnalysisLaunchControls): {
     exclude_extensions: controls.excludeExtensions,
     batch_size: controls.batchSize,
     worker_count: controls.workerCount,
+    spec_template: controls.specTemplate,
   }
 }
 

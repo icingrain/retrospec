@@ -7,22 +7,23 @@ import {
   jobDetailResponseSchema,
   jobListResponseSchema,
   registerProjectResponseSchema,
-  submitJobResponseSchema,
 } from "./schemas"
 import type {
-  AnalysisLaunchControls,
   AnalysisStatusResponse,
   AwaitJobResponse,
   DaemonEndpoint,
   ExportFileRecord,
   GeneratedValidationResponse,
-  JobActor,
   JobDetailResponse,
   JobId,
   JobListResponse,
   RegisterProjectResponse,
-  SubmitJobResponse,
 } from "./types"
+export {
+  ActiveJobConflictHttpError,
+  submitJobWithDaemon,
+} from "./client-job-submit"
+export type { ActiveJobConflictResponse } from "./client-job-submit"
 
 export async function registerProjectWithDaemon(
   endpoint: DaemonEndpoint,
@@ -54,50 +55,6 @@ export async function analysisStatus(
     .json()
 
   return analysisStatusResponseSchema.parse(body)
-}
-
-export async function submitJobWithDaemon(
-  endpoint: DaemonEndpoint,
-  request: {
-    readonly projectPath: string
-    readonly actor: JobActor
-    readonly category: string
-    readonly manifestPath: string
-    readonly launchSettings?: AnalysisLaunchControls | undefined
-    readonly writeScopeKey?: string
-    readonly replaceExisting?: boolean
-  },
-): Promise<SubmitJobResponse> {
-  const body = await ky
-    .post("jobs", {
-      prefixUrl: endpoint.baseUrl,
-      headers: { Authorization: `Bearer ${endpoint.token}` },
-      json: {
-        project_path: request.projectPath,
-        actor: request.actor,
-        category: request.category,
-        manifest_path: request.manifestPath,
-        ...(request.launchSettings === undefined
-          ? {}
-          : {
-              launch_settings: {
-                scope: request.launchSettings.scope,
-                exclude_folders: request.launchSettings.excludeFolders,
-                exclude_extensions: request.launchSettings.excludeExtensions,
-                batch_size: request.launchSettings.batchSize,
-                worker_count: request.launchSettings.workerCount,
-              },
-            }),
-        ...(request.writeScopeKey === undefined ? {} : { write_scope_key: request.writeScopeKey }),
-        ...(request.replaceExisting === undefined
-          ? {}
-          : { replace_existing: request.replaceExisting }),
-      },
-      timeout: 1_000,
-    })
-    .json()
-
-  return submitJobResponseSchema.parse(body)
 }
 
 export async function listJobsWithDaemon(

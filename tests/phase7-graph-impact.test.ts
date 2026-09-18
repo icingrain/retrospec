@@ -24,7 +24,6 @@ describe("Phase 7 graph impact API", () => {
           callee_name: "createOrder",
           file_path: "src/controller.ts",
           line: 10,
-          confidence: 0.98,
           confidence_label: "EXTRACTED",
         },
         {
@@ -33,7 +32,6 @@ describe("Phase 7 graph impact API", () => {
           callee_name: "handleOrder",
           file_path: "src/routes.ts",
           line: 20,
-          confidence: 0.72,
           confidence_label: "INFERRED",
         },
         {
@@ -42,7 +40,6 @@ describe("Phase 7 graph impact API", () => {
           callee_name: "dynamicHandler",
           file_path: "src/controller.ts",
           line: 30,
-          confidence: 0.31,
           confidence_label: "AMBIGUOUS",
         },
       ],
@@ -62,7 +59,6 @@ describe("Phase 7 graph impact API", () => {
           readonly entity_id: string
           readonly relationship: string
           readonly distance: number
-          readonly confidence: number
           readonly confidence_label: string
           readonly file_path: string
         }[]
@@ -86,7 +82,6 @@ describe("Phase 7 graph impact API", () => {
         entity_id: "sym_service",
         relationship: "callee",
         distance: 1,
-        confidence: 0.98,
         confidence_label: "EXTRACTED",
         file_path: "src/controller.ts",
       },
@@ -94,7 +89,6 @@ describe("Phase 7 graph impact API", () => {
         entity_id: "sym_route",
         relationship: "caller",
         distance: 1,
-        confidence: 0.72,
         confidence_label: "INFERRED",
         file_path: "src/routes.ts",
       },
@@ -119,7 +113,6 @@ describe("Phase 7 graph impact API", () => {
           callee_name: "b",
           file_path: "src/a.ts",
           line: 1,
-          confidence: 1,
           confidence_label: "EXTRACTED",
         },
         {
@@ -128,7 +121,6 @@ describe("Phase 7 graph impact API", () => {
           callee_name: "a",
           file_path: "src/b.ts",
           line: 2,
-          confidence: 0.8,
           confidence_label: "INFERRED",
         },
       ],

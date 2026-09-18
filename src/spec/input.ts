@@ -67,7 +67,6 @@ function readGlossaryMatches(paths: ProjectPaths): readonly SpecGlossaryMatch[] 
     entityId: match.entity_id,
     glossaryType: match.glossary_type,
     glossaryKey: match.glossary_key,
-    confidence: match.confidence,
   }))
 }
 

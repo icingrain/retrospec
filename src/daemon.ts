@@ -7,6 +7,7 @@ import { readEndpoint, shutdownEndpoint } from "./discovery"
 import { createAuthToken } from "./ids"
 import { recoverInterruptedJobs } from "./jobs"
 import { registerMcpRoutes } from "./mcp-routes"
+import { syncRetrospecMcpEndpoint } from "./opencode-mcp-sync"
 import { ensureRuntimeDir, runtimePaths } from "./paths"
 import { listProjects } from "./registry"
 import type { AuthToken, HealthResponse, Port, RuntimePaths } from "./types"
@@ -132,6 +133,11 @@ async function shutdownExistingDaemon(paths: RuntimePaths): Promise<void> {
 
 export async function runDaemonForever(paths = runtimePaths()): Promise<void> {
   const daemon = await startDaemon(paths)
+  await syncRetrospecMcpEndpoint(process.cwd(), {
+    port: daemon.port,
+    token: daemon.token,
+    baseUrl: `http://127.0.0.1:${daemon.port}`,
+  })
   console.log(`retrospec daemon listening on 127.0.0.1:${daemon.port}`)
   await new Promise<never>(() => {})
 }

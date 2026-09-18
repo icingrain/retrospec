@@ -91,10 +91,9 @@ export async function ensureSpecAnalysisStore(paths: ProjectPaths): Promise<void
         analysis_run_id text not null,
         title text not null,
         priority text not null,
-        summary text not null,
-        evidence_label text not null,
-        confidence real,
-        source_anchor_json text not null default '{}',
+	        summary text not null,
+	        evidence_label text not null,
+	        source_anchor_json text not null default '{}',
         created_at text not null,
         primary key (analysis_run_id, group_id)
       );
@@ -108,10 +107,9 @@ export async function ensureSpecAnalysisStore(paths: ProjectPaths): Promise<void
         migration_type text not null,
         priority text not null,
         summary text not null,
-        recommendation text not null,
-        evidence_label text not null,
-        confidence real,
-        source_anchor_json text not null default '{}',
+	        recommendation text not null,
+	        evidence_label text not null,
+	        source_anchor_json text not null default '{}',
         created_at text not null,
         primary key (analysis_run_id, finding_id)
       );
@@ -123,10 +121,9 @@ export async function ensureSpecAnalysisStore(paths: ProjectPaths): Promise<void
         file_path text,
         title text not null,
         body text not null,
-        rank integer not null,
-        evidence_label text not null,
-        confidence real,
-        source_anchor_json text not null default '{}',
+	        rank integer not null,
+	        evidence_label text not null,
+	        source_anchor_json text not null default '{}',
         created_at text not null,
         primary key (analysis_run_id, section_id)
       );

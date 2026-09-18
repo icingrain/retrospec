@@ -9,7 +9,6 @@ export type ImpactedEntity = {
   readonly entity_id: string
   readonly relationship: ImpactRelationship
   readonly distance: number
-  readonly confidence: number
   readonly confidence_label: CallConfidenceLabel
   readonly file_path: string
 }
@@ -34,7 +33,6 @@ type CallRow = {
   readonly caller_entity_id: string
   readonly callee_entity_id: string | null
   readonly file_path: string
-  readonly confidence: number
   readonly confidence_label: CallConfidenceLabel
 }
 
@@ -123,8 +121,8 @@ function walkImpact(
 function adjacentRows(db: Database, entityId: string): readonly CallRow[] {
   return db
     .query<CallRow, [string, string]>(
-      `select rowid as row_id, caller_entity_id, callee_entity_id, file_path, confidence, confidence_label
-       from calls
+      `select rowid as row_id, caller_entity_id, callee_entity_id, file_path, confidence_label
+	       from calls
        where caller_entity_id = ? or callee_entity_id = ?
        order by line`,
     )
@@ -150,7 +148,6 @@ function impactFromRow(
         entity_id: row.callee_entity_id,
         relationship: "callee",
         distance,
-        confidence: row.confidence,
         confidence_label: row.confidence_label,
         file_path: row.file_path,
       },
@@ -162,7 +159,6 @@ function impactFromRow(
         entity_id: row.caller_entity_id,
         relationship: "caller",
         distance,
-        confidence: row.confidence,
         confidence_label: row.confidence_label,
         file_path: row.file_path,
       },

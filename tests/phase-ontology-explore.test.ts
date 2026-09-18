@@ -42,7 +42,6 @@ describe("Phase 6 ontology explore and glossary search APIs", () => {
           callee_name: "helper",
           file_path: "src/main/java/demo/OrderService.java",
           line: 3,
-          confidence: 0.88,
           confidence_label: "INFERRED",
         },
       ],
@@ -119,7 +118,6 @@ describe("Phase 6 ontology explore and glossary search APIs", () => {
           readonly meaning: string
           readonly entity_id: string | null
           readonly symbol_name: string | null
-          readonly confidence: number
           readonly source: string
         }[]
       }>()
@@ -129,7 +127,6 @@ describe("Phase 6 ontology explore and glossary search APIs", () => {
         term: "OrderService",
         meaning: "Handles order totals",
         symbol_name: "OrderService",
-        confidence: 1,
         source: "glossary_terms",
       }),
     )

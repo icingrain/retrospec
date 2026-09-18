@@ -26,7 +26,6 @@ describe("Phase 7 community candidates", () => {
           callee_name: "createOrder",
           file_path: "src/order/controller.ts",
           line: 10,
-          confidence: 0.99,
           confidence_label: "EXTRACTED",
         },
         {
@@ -35,7 +34,6 @@ describe("Phase 7 community candidates", () => {
           callee_name: "saveOrder",
           file_path: "src/order/service.ts",
           line: 20,
-          confidence: 0.42,
           confidence_label: "AMBIGUOUS",
         },
         {
@@ -44,7 +42,6 @@ describe("Phase 7 community candidates", () => {
           callee_name: "charge",
           file_path: "src/billing/controller.ts",
           line: 30,
-          confidence: 0.91,
           confidence_label: "EXTRACTED",
         },
       ],
@@ -139,7 +136,6 @@ describe("Phase 7 community candidates", () => {
           callee_name: "oldB",
           file_path: "src/old.ts",
           line: 1,
-          confidence: 1,
           confidence_label: "EXTRACTED",
         },
       ],
@@ -160,7 +156,6 @@ describe("Phase 7 community candidates", () => {
           callee_name: "newB",
           file_path: "src/new.ts",
           line: 1,
-          confidence: 1,
           confidence_label: "EXTRACTED",
         },
       ],
@@ -250,7 +245,6 @@ function edge(caller: string, callee: string, line: number) {
     callee_name: callee,
     file_path: "src/graph.ts",
     line,
-    confidence: 1,
     confidence_label: "EXTRACTED" as const,
   }
 }

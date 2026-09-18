@@ -53,16 +53,17 @@ export function bootstrapProjectRegistry(paths: ProjectPaths): void {
 	        updated_at text not null
 	      );
 
-        create table if not exists analysis_launch_settings (
-          settings_key text primary key,
-          scope_mode text not null,
-          scope_roots_json text not null,
-          exclude_folders_json text not null default '[]',
-          exclude_extensions_json text not null default '[]',
-          batch_size integer not null default 50,
-          worker_count integer not null default 2,
-          updated_at text not null
-        );
+	        create table if not exists analysis_launch_settings (
+	          settings_key text primary key,
+	          scope_mode text not null,
+	          scope_roots_json text not null,
+	          exclude_folders_json text not null default '[]',
+	          exclude_extensions_json text not null default '[]',
+	          batch_size integer not null default 50,
+	          worker_count integer not null default 2,
+	          spec_template text not null default 'risk',
+	          updated_at text not null
+	        );
 
         create table if not exists spec_provider_settings (
           settings_key text primary key,
@@ -111,6 +112,7 @@ function ensureRegistryColumns(db: Database): void {
     "exclude_extensions_json text not null default '[]'",
     "batch_size integer not null default 50",
     "worker_count integer not null default 2",
+    "spec_template text not null default 'risk'",
   ])
   ensureColumns(db, "spec_provider_settings", ["api_key text"])
 }

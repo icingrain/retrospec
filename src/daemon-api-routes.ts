@@ -179,6 +179,7 @@ export function registerApiRoutes(
                   excludeExtensions: request.launch_settings.exclude_extensions,
                   batchSize: request.launch_settings.batch_size,
                   workerCount: request.launch_settings.worker_count,
+                  specTemplate: request.launch_settings.spec_template,
                 }),
         }),
       )

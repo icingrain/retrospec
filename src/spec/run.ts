@@ -27,9 +27,11 @@ export async function runSpecAnalysis(
   const driver = isSpecAnalysisDriver(scopeOrDriver)
     ? scopeOrDriver
     : (driverInput ?? (await selectSavedSpecAnalysisDriver(paths)))
+  const analysisType = specTemplate(scope)
   const input = await buildSpecBatchInput(paths, specAnalysisCategories, launchScope(scope))
   const run = await beginSpecAnalysisRun(paths, {
-    analysisType: "risk",
+    analysisType,
+    templateId: `${analysisType}.v1`,
     inputCategories: specAnalysisCategories,
     providerMode: driver.providerMode,
     model: driver.model,
@@ -82,6 +84,12 @@ function launchScope(
   value: AnalysisScope | AnalysisLaunchControls | undefined,
 ): AnalysisScope | undefined {
   return value !== undefined && "batchSize" in value ? value.scope : value
+}
+
+function specTemplate(
+  value: AnalysisScope | AnalysisLaunchControls | undefined,
+): AnalysisLaunchControls["specTemplate"] {
+  return value !== undefined && "batchSize" in value ? value.specTemplate : "risk"
 }
 
 function normalizeRiskFindings(

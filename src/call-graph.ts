@@ -20,7 +20,6 @@ export type CallGraphEdge = {
   readonly callee_name: string
   readonly file_path: string
   readonly line: number
-  readonly confidence: number
   readonly confidence_label: CallConfidenceLabel
 }
 
@@ -29,7 +28,6 @@ export type SequenceCandidate = {
   readonly root_entity_id: string
   readonly participant_entity_ids: readonly string[]
   readonly call_path: readonly string[]
-  readonly confidence: number
   readonly reason: string | null
 }
 
@@ -86,8 +84,8 @@ function writeCalls(db: Database, calls: readonly CallGraphEdge[], retroRunId: s
   const insert = db.query(
     `insert into calls
      (call_id, retro_run_id, caller_entity_id, callee_entity_id, callee_name, file_path, line,
-      confidence, confidence_label, evidence_label, parser_backend, resolution_status, reason)
-     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      confidence_label, evidence_label, parser_backend, resolution_status, reason)
+     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
 
   for (const call of calls) {
@@ -100,7 +98,6 @@ function writeCalls(db: Database, calls: readonly CallGraphEdge[], retroRunId: s
       call.callee_name,
       call.file_path,
       call.line,
-      call.confidence,
       call.confidence_label,
       call.confidence_label,
       callGraphEvidence.parserBackend,
@@ -117,9 +114,9 @@ function writeSequenceCandidates(
 ): void {
   const insert = db.query(
     `insert into sequence_candidates
-     (sequence_id, retro_run_id, root_entity_id, participant_entity_ids, participant_entity_ids_json,
-      call_path, call_path_json, confidence, evidence_label, reason)
-     values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+	     (sequence_id, retro_run_id, root_entity_id, participant_entity_ids, participant_entity_ids_json,
+	      call_path, call_path_json, evidence_label, reason)
+	     values (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
 
   for (const candidate of candidates) {
@@ -133,7 +130,6 @@ function writeSequenceCandidates(
       participantEntityIds,
       callPath,
       callPath,
-      candidate.confidence,
       callGraphEvidence.evidenceLabel,
       candidate.reason,
     )

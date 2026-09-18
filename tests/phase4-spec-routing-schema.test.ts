@@ -86,7 +86,6 @@ describe("Phase 4 spec routing and durable schema", () => {
         summary: "Auth needs typed migration.",
         recommendation: "Migrate auth before API handlers.",
         evidenceLabel: "EXTRACTED",
-        confidence: 0.91,
         sourceAnchor: { filePath: "src/auth.ts", line: 10 },
       },
     ])
@@ -119,10 +118,9 @@ describe("Phase 4 spec routing and durable schema", () => {
             readonly finding_id: string
             readonly group_id: string
             readonly evidence_label: string
-            readonly confidence: number
           },
           []
-        >("select finding_id, group_id, evidence_label, confidence from migration_findings")
+        >("select finding_id, group_id, evidence_label from migration_findings")
         .get()
       const section = db
         .query<
@@ -140,7 +138,6 @@ describe("Phase 4 spec routing and durable schema", () => {
         finding_id: "mig-1",
         group_id: "group-auth",
         evidence_label: "EXTRACTED",
-        confidence: 0.91,
       })
       expect(section).toEqual({ section_id: "overview", rank: 1, evidence_label: "INFERRED" })
     } finally {

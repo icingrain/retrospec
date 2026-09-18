@@ -7,7 +7,6 @@ export type GlossaryEntityMatchRecord = {
   readonly entity_id: string
   readonly glossary_type: "term"
   readonly glossary_key: string
-  readonly confidence: number
   readonly matched_at: string
 }
 
@@ -36,12 +35,11 @@ export function ensureGlossaryStore(db: Database): void {
       imported_at text not null
     );
 
-    create table if not exists entity_glossary_matches (
-      entity_id text not null,
-      glossary_type text not null,
-      glossary_key text not null,
-      confidence real not null,
-      matched_at text not null,
+	    create table if not exists entity_glossary_matches (
+	      entity_id text not null,
+	      glossary_type text not null,
+	      glossary_key text not null,
+	      matched_at text not null,
       primary key (entity_id, glossary_type, glossary_key)
     );
   `)
@@ -87,8 +85,8 @@ export function regenerateEntityGlossaryMatches(
   const terms = readTermRows(db)
   db.exec("delete from entity_glossary_matches")
   const insert = db.query(
-    `insert into entity_glossary_matches (entity_id, glossary_type, glossary_key, confidence, matched_at)
-     values (?, 'term', ?, ?, ?)`,
+    `insert into entity_glossary_matches (entity_id, glossary_type, glossary_key, matched_at)
+	     values (?, 'term', ?, ?)`,
   )
   let count = 0
   const registry = new Database(registryDb, { readonly: true })
@@ -107,12 +105,7 @@ export function regenerateEntityGlossaryMatches(
       const haystack = `${entity.file_path} ${entity.symbol_name ?? ""}`.toLowerCase()
       for (const term of terms) {
         if (haystack.includes(term.term.toLowerCase())) {
-          insert.run(
-            entity.entity_id,
-            term.term,
-            entity.symbol_name === term.term ? 1 : 0.75,
-            matchedAt,
-          )
+          insert.run(entity.entity_id, term.term, matchedAt)
           count += 1
         }
       }
@@ -163,8 +156,8 @@ function readTermRows(db: Database): readonly GlossaryTermRecord[] {
 function readEntityMatches(db: Database): readonly GlossaryEntityMatchRecord[] {
   return db
     .query<GlossaryEntityMatchRecord, []>(
-      `select entity_id, glossary_type, glossary_key, confidence, matched_at
-       from entity_glossary_matches
+      `select entity_id, glossary_type, glossary_key, matched_at
+	       from entity_glossary_matches
        order by entity_id, glossary_key`,
     )
     .all()

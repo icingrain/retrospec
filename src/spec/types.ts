@@ -86,7 +86,6 @@ export type SpecGlossaryMatch = {
   readonly entityId: string
   readonly glossaryType: string
   readonly glossaryKey: string
-  readonly confidence: number
 }
 
 export type SpecBatchEntity = {
@@ -133,7 +132,6 @@ export type MigrationGroupInput = {
   readonly priority: string
   readonly summary: string
   readonly evidenceLabel?: SpecEvidenceLabel
-  readonly confidence?: number
   readonly sourceAnchor?: SpecSourceAnchor
 }
 
@@ -147,7 +145,6 @@ export type MigrationFindingInput = {
   readonly summary: string
   readonly recommendation: string
   readonly evidenceLabel?: SpecEvidenceLabel
-  readonly confidence?: number
   readonly sourceAnchor?: SpecSourceAnchor
 }
 
@@ -159,7 +156,6 @@ export type SummarySectionInput = {
   readonly entityId?: string
   readonly filePath?: string
   readonly evidenceLabel?: SpecEvidenceLabel
-  readonly confidence?: number
   readonly sourceAnchor?: SpecSourceAnchor
 }
 

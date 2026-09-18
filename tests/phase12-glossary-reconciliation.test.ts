@@ -92,7 +92,6 @@ describe("Phase 12 glossary reconciliation", () => {
         entityId: match.entity_id,
         glossaryType: match.glossary_type,
         glossaryKey: match.glossary_key,
-        confidence: match.confidence,
       })),
     )
     expect(specInput.memoryNotes).toEqual([])

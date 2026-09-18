@@ -19,7 +19,6 @@ describe("Phase 7 call graph confidence schema", () => {
           callee_name: "createOrder",
           file_path: "src/controller.ts",
           line: 14,
-          confidence: 0.99,
           confidence_label: "EXTRACTED",
         },
         {
@@ -28,7 +27,6 @@ describe("Phase 7 call graph confidence schema", () => {
           callee_name: "handler",
           file_path: "src/controller.ts",
           line: 21,
-          confidence: 0.35,
           confidence_label: "AMBIGUOUS",
         },
       ],
@@ -38,7 +36,6 @@ describe("Phase 7 call graph confidence schema", () => {
           root_entity_id: "sym_controller",
           participant_entity_ids: ["sym_controller", "sym_service"],
           call_path: ["sym_controller", "sym_service"],
-          confidence: 0.82,
           reason: "controller-to-service happy path has extracted evidence",
         },
       ],
@@ -48,10 +45,9 @@ describe("Phase 7 call graph confidence schema", () => {
     try {
       const labels = db.query("select confidence_label from calls order by line").values().flat()
       const ambiguous = db
-        .query("select callee_entity_id, confidence, confidence_label from calls where line = 21")
+        .query("select callee_entity_id, confidence_label from calls where line = 21")
         .get() as {
         readonly callee_entity_id: string | null
-        readonly confidence: number
         readonly confidence_label: string
       }
       const sequence = db
@@ -64,7 +60,6 @@ describe("Phase 7 call graph confidence schema", () => {
 
       expect(labels).toEqual(["EXTRACTED", "AMBIGUOUS"])
       expect(ambiguous.callee_entity_id).toBeNull()
-      expect(ambiguous.confidence).toBe(0.35)
       expect(ambiguous.confidence_label).toBe("AMBIGUOUS")
       expect(JSON.parse(sequence.participant_entity_ids)).toEqual(["sym_controller", "sym_service"])
       expect(JSON.parse(sequence.call_path)).toEqual(["sym_controller", "sym_service"])

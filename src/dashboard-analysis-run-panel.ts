@@ -40,23 +40,29 @@ export function renderRunPlanPanel(input: DashboardAnalysisLaunchInput): string 
 	            <span class="fact-label">Retro input: automatic</span>
 	            <span class="fact-value">Full project uses the canonical full run. Selected folders use the latest matching partial run when available.</span>
 		          </div>
-		          ${renderTemplatePicker(input.specTemplates)}
+	          ${renderTemplatePicker(input.specTemplates, input.savedSettings?.specTemplate ?? "risk")}
 		          ${renderProviderSettings(providerSettings)}
 		          ${renderExecutionSettings(input.savedSettings)}
 		          ${renderProviderSaveAction()}
 		        </section>`
 }
 
-function renderTemplatePicker(templates: readonly DashboardSpecTemplateOption[]): string {
+function renderTemplatePicker(
+  templates: readonly DashboardSpecTemplateOption[],
+  selectedTemplate: DashboardSpecTemplateOption["name"],
+): string {
   return `<fieldset class="launch-fieldset template-picker">
             <legend>Spec template selector</legend>
-            ${templates.map(renderTemplateOption).join("")}
+            ${templates.map((template) => renderTemplateOption(template, selectedTemplate)).join("")}
           </fieldset>`
 }
 
-function renderTemplateOption(template: DashboardSpecTemplateOption): string {
+function renderTemplateOption(
+  template: DashboardSpecTemplateOption,
+  selectedTemplate: DashboardSpecTemplateOption["name"],
+): string {
   return `<label class="launch-choice">
-            <input type="radio" name="spec_template" value="${template.name}" ${template.name === "risk" ? "checked" : ""}>
+            <input type="radio" name="spec_template" value="${template.name}" ${template.name === selectedTemplate ? "checked" : ""}>
             <span>${template.name}<small>${escapeHtml(template.description)}</small></span>
           </label>`
 }

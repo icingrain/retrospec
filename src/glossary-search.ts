@@ -8,7 +8,6 @@ export type GlossarySearchMatch = {
   readonly meaning: string
   readonly entity_id: string | null
   readonly symbol_name: string | null
-  readonly confidence: number
   readonly source: "glossary_terms"
 }
 
@@ -20,7 +19,6 @@ type TermRow = {
 type EntityMatchRow = {
   readonly entity_id: string
   readonly symbol_name: string | null
-  readonly confidence: number
 }
 
 export function searchGlossary(paths: ProjectPaths, term: string): readonly GlossarySearchMatch[] {
@@ -73,11 +71,11 @@ function readEntityMatches(
   const registry = new Database(paths.registryDb, { readonly: true })
   try {
     return db
-      .query<Pick<EntityMatchRow, "entity_id" | "confidence">, [string]>(
-        `select entity_id, confidence
-         from entity_glossary_matches
-         where glossary_key = ?
-         order by confidence desc, entity_id`,
+      .query<Pick<EntityMatchRow, "entity_id">, [string]>(
+        `select entity_id
+	         from entity_glossary_matches
+	         where glossary_key = ?
+	         order by entity_id`,
       )
       .all(term)
       .map((match) => ({
@@ -105,7 +103,6 @@ function toSearchMatch(term: TermRow, match: EntityMatchRow | null): GlossarySea
     meaning: term.meaning,
     entity_id: match?.entity_id ?? null,
     symbol_name: match?.symbol_name ?? null,
-    confidence: match?.confidence ?? 0.5,
     source: "glossary_terms",
   }
 }
