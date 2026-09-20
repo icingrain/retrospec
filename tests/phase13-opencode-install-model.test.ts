@@ -24,13 +24,14 @@ describe("Phase 13 opencode install model selection", () => {
 
   test("Given install receives a model option When opencode has a different model Then the option wins", async () => {
     const projectRoot = await tempProject()
+    const homeRoot = await tempProject()
     const configPath = join(projectRoot, ".opencode", "opencode.jsonc")
     await mkdir(join(projectRoot, ".opencode"), { recursive: true })
     await writeFile(configPath, JSON.stringify({ model: "openai/gpt-5.5" }))
 
     const result = await installRetrospecOpenCodeConfig(
       projectRoot,
-      {},
+      { HOME: homeRoot },
       { model: "google/gemini-2.5-pro" },
     )
 
@@ -56,13 +57,43 @@ describe("Phase 13 opencode install model selection", () => {
     ])
   })
 
-  test("Given model selection is requested When the user chooses a provider model Then install uses that model", async () => {
+  test("Given manual model setup is requested When one model is entered Then install saves reusable defaults", async () => {
     const projectRoot = await tempProject()
+    const nextProjectRoot = await tempProject()
+    const homeRoot = await tempProject()
     const configPath = join(projectRoot, ".opencode", "opencode.jsonc")
-    const prompt = promptIo("2\n")
+    const nextConfigPath = join(nextProjectRoot, ".opencode", "opencode.jsonc")
+    const prompt = promptIo("1\ny\nanthropic/claude-sonnet-4-5-20250929\n")
     await mkdir(join(projectRoot, ".opencode"), { recursive: true })
+    await mkdir(join(nextProjectRoot, ".opencode"), { recursive: true })
+    await writeFile(configPath, JSON.stringify({ model: "openai/gpt-5.5" }))
+
+    const result = await installRetrospecOpenCodeConfig(
+      projectRoot,
+      { HOME: homeRoot },
+      { selectModel: true, prompt: prompt.io },
+    )
+    await installRetrospecOpenCodeConfig(nextProjectRoot, { HOME: homeRoot })
+
+    const config = JSON.parse(await readFile(configPath, "utf8"))
+    const nextConfig = JSON.parse(await readFile(nextConfigPath, "utf8"))
+    expect(prompt.output()).toContain("Select Retrospec model setup mode")
+    expect(result.agentModel).toBe("anthropic/claude-sonnet-4-5-20250929")
+    expect(config.agent.retrospec.model).toBe("anthropic/claude-sonnet-4-5-20250929")
+    expect(nextConfig.agent.retrospec.model).toBe("anthropic/claude-sonnet-4-5-20250929")
+  })
+
+  test("Given global opencode config defines providers When selecting provider mode Then install uses global provider choices", async () => {
+    const projectRoot = await tempProject()
+    const homeRoot = await tempProject()
+    const configPath = join(projectRoot, ".opencode", "opencode.jsonc")
+    const globalConfigDir = join(homeRoot, ".config", "opencode")
+    const prompt = promptIo("2\n1\ny\nclaude-sonnet-4-5-20250929\n")
+    await mkdir(join(projectRoot, ".opencode"), { recursive: true })
+    await mkdir(globalConfigDir, { recursive: true })
+    await writeFile(configPath, JSON.stringify({ retrospec: { hooks_enabled: false } }))
     await writeFile(
-      configPath,
+      join(globalConfigDir, "opencode.json"),
       JSON.stringify({
         model: "openai/gpt-5.5",
         provider: { anthropic: { models: { "claude-sonnet-4-5-20250929": {} } } },
@@ -71,31 +102,41 @@ describe("Phase 13 opencode install model selection", () => {
 
     const result = await installRetrospecOpenCodeConfig(
       projectRoot,
-      {},
+      { HOME: homeRoot },
       { selectModel: true, prompt: prompt.io },
     )
 
     const config = JSON.parse(await readFile(configPath, "utf8"))
-    expect(prompt.output()).toContain("Select opencode model for Retrospec agents")
+    expect(prompt.output()).toContain("Select opencode provider")
     expect(result.agentModel).toBe("anthropic/claude-sonnet-4-5-20250929")
     expect(config.agent.retrospec.model).toBe("anthropic/claude-sonnet-4-5-20250929")
+    expect(config.provider).toBeUndefined()
   })
 })
 
 function promptIo(answer: string): {
-  readonly io: { readonly input: Readable; readonly output: Writable }
+  readonly io: {
+    readonly input: Readable
+    readonly output: Writable
+    readonly question: (prompt: string) => Promise<string>
+  }
   readonly output: () => string
 } {
   let written = ""
+  const lines = answer.split("\n")
   return {
     io: {
-      input: Readable.from([answer]),
+      input: Readable.from([]),
       output: new Writable({
         write(chunk, _encoding, callback) {
           written += String(chunk)
           callback()
         },
       }),
+      question: async (prompt) => {
+        written += prompt
+        return lines.shift() ?? ""
+      },
     },
     output: () => written,
   }

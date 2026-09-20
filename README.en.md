@@ -100,10 +100,27 @@ OpenCode
 Bun >= 1.3.0
 ```
 
+Before launching OpenCode for a project, add the Retrospec agents to that project's OpenCode config.
+
+```bash
+cd /path/to/your/project
+retrospec install .
+```
+
+On the first setup, Retrospec asks which model setup to use. The chosen Retrospec agent models are saved under `retrospec.agent_models` in the global OpenCode config, so running `retrospec install .` in another project writes the same model values into that project's `.opencode/opencode.jsonc`.
+
+To change the model setup later, rerun the selection flow from the target project.
+
+```bash
+retrospec install . --select-model
+```
+
+OpenCode provider/API key/model catalog settings still belong in the global OpenCode config (`~/.config/opencode/opencode.json` or `OPENCODE_CONFIG_DIR/opencode.json`). Retrospec only reads provider names from there and writes concrete agent model values into the project `.opencode/opencode.jsonc`.
+
 You can also ask an OpenCode agent to do the setup:
 
 ```text
-Install retrospec-agent for this project, then verify status and the dashboard URL for the current project.
+Run retrospec install . for this project first so the Retrospec agents are added, then verify status and the dashboard URL for the current project.
 ```
 
 For agent-driven setup and daemon recovery, point the agent to [`docs/agent-install.en.md`](docs/agent-install.en.md).

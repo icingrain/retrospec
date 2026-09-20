@@ -110,10 +110,27 @@ OpenCode
 Bun >= 1.3.0
 ```
 
+분석할 프로젝트에서 OpenCode를 실행하기 전에 Retrospec agent 설정을 먼저 추가해야 합니다.
+
+```bash
+cd /path/to/your/project
+retrospec install .
+```
+
+처음 설정하는 환경에서는 사용할 모델을 묻습니다. 한 번 설정한 Retrospec agent 모델은 전역 OpenCode 설정의 `retrospec.agent_models`에 저장되어, 다른 프로젝트에서 `retrospec install .`을 실행할 때 같은 값으로 `.opencode/opencode.jsonc`가 생성됩니다.
+
+모델을 바꾸려면 대상 프로젝트에서 선택 flow를 다시 실행하세요.
+
+```bash
+retrospec install . --select-model
+```
+
+OpenCode provider/API key/model catalog 자체는 전역 OpenCode 설정(`~/.config/opencode/opencode.json` 또는 `OPENCODE_CONFIG_DIR/opencode.json`)에서 관리하고, Retrospec은 그 provider 이름만 읽어 agent별 model 값을 프로젝트 `.opencode/opencode.jsonc`에 씁니다.
+
 OpenCode agent에게 맡기는 경우에는 이렇게 요청해도 됩니다.
 
 ```text
-이 프로젝트에 retrospec-agent 설치하고, 현재 프로젝트 기준으로 status와 dashboard까지 확인해줘.
+이 프로젝트에서 retrospec install . 먼저 실행해서 Retrospec agent를 추가하고, 현재 프로젝트 기준으로 status와 dashboard까지 확인해줘.
 ```
 
 설치·daemon 재시작·상태 확인을 OpenCode agent에게 맡길 때는 [`docs/agent-install.md`](docs/agent-install.md)를 함께 참고하게 하면 됩니다.

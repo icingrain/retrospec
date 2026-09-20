@@ -31,10 +31,11 @@ async function main(): Promise<void> {
     }
     case "install": {
       const options = parseInstallOptions(args.slice(1))
-      const selectModel = options.selectModel || isInteractiveInstall()
+      const promptOnMissingModel = !options.selectModel && isInteractiveInstall()
       const installOptions = {
         ...(options.model === undefined ? {} : { model: options.model }),
-        ...(selectModel ? { selectModel } : {}),
+        ...(options.selectModel ? { selectModel: true } : {}),
+        ...(promptOnMissingModel ? { promptOnMissingModel } : {}),
       }
       const result = await installRetrospecOpenCodeConfig(
         options.projectRoot,

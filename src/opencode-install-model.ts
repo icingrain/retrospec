@@ -1,20 +1,71 @@
-import { stdin, stdout } from "node:process"
-import { createInterface } from "node:readline/promises"
+import {
+  providerNames,
+  readOpenCodeGlobalConfig,
+  readRetrospecAgentModelDefaults,
+  writeRetrospecAgentModelDefaults,
+} from "./opencode-global-config"
+import {
+  type InstallModelPromptIo,
+  selectInstallAgentModels,
+} from "./opencode-install-model-prompt"
+import {
+  type RetrospecInstallAgentModels,
+  completeAgentModels,
+  defaultInstallModel,
+  modelsForAll,
+} from "./opencode-install-model-values"
+export type { InstallModelPromptIo } from "./opencode-install-model-prompt"
+export type {
+  RetrospecInstallAgentKey,
+  RetrospecInstallAgentModels,
+} from "./opencode-install-model-values"
+export { retrospecInstallAgentKeys } from "./opencode-install-model-values"
 
 export type OpenCodeInstallModelConfig = {
   readonly model?: string | undefined
   readonly provider?: unknown
 }
 
-export type InstallModelPromptIo = {
-  readonly input: NodeJS.ReadableStream
-  readonly output: NodeJS.WritableStream
-}
-
 export type InstallModelSelectionOptions = {
   readonly model?: string | undefined
   readonly selectModel?: boolean | undefined
+  readonly promptOnMissingModel?: boolean | undefined
   readonly prompt?: InstallModelPromptIo | undefined
+}
+
+export async function resolveInstallAgentModels(
+  config: OpenCodeInstallModelConfig,
+  env: NodeJS.ProcessEnv,
+  options: InstallModelSelectionOptions,
+): Promise<RetrospecInstallAgentModels> {
+  const globalConfig = await readOpenCodeGlobalConfig(env)
+  const fallbackModel = installFallbackModel(config, globalConfig)
+  const savedModels = readRetrospecAgentModelDefaults(globalConfig)
+
+  if (options.model !== undefined) {
+    const agentModels = modelsForAll(options.model)
+    await writeRetrospecAgentModelDefaults(env, agentModels)
+    return agentModels
+  }
+  if (hasEnvAgentModel(env)) {
+    return envAgentModels(env, fallbackModel)
+  }
+  if (
+    options.selectModel === true ||
+    (options.promptOnMissingModel === true && savedModels === undefined)
+  ) {
+    const agentModels = await selectInstallAgentModels(
+      providerNames(globalConfig),
+      fallbackModel,
+      options.prompt,
+    )
+    await writeRetrospecAgentModelDefaults(env, agentModels)
+    return agentModels
+  }
+  if (savedModels !== undefined) {
+    return completeAgentModels(savedModels, fallbackModel)
+  }
+  return modelsForAll(fallbackModel)
 }
 
 export async function resolveInstallModel(
@@ -22,22 +73,7 @@ export async function resolveInstallModel(
   env: NodeJS.ProcessEnv,
   options: InstallModelSelectionOptions,
 ): Promise<string | undefined> {
-  const envModel = env["RETROSPEC_AGENT_MODEL"]
-  if (options.model !== undefined) {
-    return options.model
-  }
-  if (envModel !== undefined) {
-    return envModel
-  }
-  if (options.selectModel === true) {
-    const selected = await selectOpenCodeModel(
-      discoverOpenCodeModels(config),
-      config.model,
-      options.prompt,
-    )
-    return selected ?? config.model
-  }
-  return config.model
+  return (await resolveInstallAgentModels(config, env, options)).retrospec
 }
 
 export function applyInstallModelEnv(
@@ -61,28 +97,56 @@ export function discoverOpenCodeModels(config: OpenCodeInstallModelConfig): read
   return [...models]
 }
 
-async function selectOpenCodeModel(
-  models: readonly string[],
-  currentModel: string | undefined,
-  prompt: InstallModelPromptIo | undefined,
-): Promise<string | undefined> {
-  if (models.length === 0) {
-    return undefined
-  }
-  if (models.length === 1) {
-    return models[0]
-  }
+function installFallbackModel(
+  projectConfig: OpenCodeInstallModelConfig,
+  globalConfig: OpenCodeInstallModelConfig,
+): string {
+  return projectConfig.model ?? globalConfig.model ?? defaultInstallModel
+}
 
-  const io = prompt ?? { input: stdin, output: stdout }
-  const rl = createInterface({ input: io.input, output: io.output })
-  try {
-    writeModelChoices(io.output, models, currentModel)
-    const fallbackIndex = defaultModelIndex(models, currentModel)
-    const answer = await rl.question(`Choose Retrospec agent model [${fallbackIndex + 1}]: `)
-    return parseModelChoice(answer, models, fallbackIndex)
-  } finally {
-    rl.close()
-  }
+function hasEnvAgentModel(env: NodeJS.ProcessEnv): boolean {
+  return (
+    env["RETROSPEC_AGENT_MODEL"] !== undefined ||
+    env["RETROSPEC_AGENT_MODEL_EXCAVATOR"] !== undefined ||
+    env["RETROSPEC_AGENT_MODEL_SURVEYOR"] !== undefined ||
+    env["RETROSPEC_AGENT_MODEL_CURATOR"] !== undefined ||
+    env["RETROSPEC_AGENT_MODEL_ARCHIVIST"] !== undefined ||
+    env["RETROSPEC_AGENT_MODEL_APPRAISER"] !== undefined
+  )
+}
+
+function envAgentModels(
+  env: NodeJS.ProcessEnv,
+  fallbackModel: string,
+): RetrospecInstallAgentModels {
+  const defaultModel = env["RETROSPEC_AGENT_MODEL"] ?? fallbackModel
+  return completeAgentModels(
+    {
+      ...(env["RETROSPEC_AGENT_MODEL_CURATOR"] === undefined
+        ? {}
+        : {
+            retrospec: env["RETROSPEC_AGENT_MODEL_CURATOR"],
+            spec: env["RETROSPEC_AGENT_MODEL_CURATOR"],
+            curator: env["RETROSPEC_AGENT_MODEL_CURATOR"],
+          }),
+      ...(env["RETROSPEC_AGENT_MODEL_SURVEYOR"] === undefined
+        ? {}
+        : {
+            retro: env["RETROSPEC_AGENT_MODEL_SURVEYOR"],
+            surveyor: env["RETROSPEC_AGENT_MODEL_SURVEYOR"],
+          }),
+      ...(env["RETROSPEC_AGENT_MODEL_ARCHIVIST"] === undefined
+        ? {}
+        : { archivist: env["RETROSPEC_AGENT_MODEL_ARCHIVIST"] }),
+      ...(env["RETROSPEC_AGENT_MODEL_APPRAISER"] === undefined
+        ? {}
+        : { appraiser: env["RETROSPEC_AGENT_MODEL_APPRAISER"] }),
+      ...(env["RETROSPEC_AGENT_MODEL_EXCAVATOR"] === undefined
+        ? {}
+        : { excavator: env["RETROSPEC_AGENT_MODEL_EXCAVATOR"] }),
+    },
+    defaultModel,
+  )
 }
 
 function discoverProviderModels(provider: unknown): readonly string[] {
@@ -108,43 +172,6 @@ function providerModelRecord(providerConfig: unknown): Record<string, unknown> |
   }
   const models = providerConfig["models"]
   return isRecord(models) ? models : null
-}
-
-function writeModelChoices(
-  output: NodeJS.WritableStream,
-  models: readonly string[],
-  currentModel: string | undefined,
-): void {
-  output.write("Select opencode model for Retrospec agents:\n")
-  for (const [index, model] of models.entries()) {
-    const marker = model === currentModel ? " (current)" : ""
-    output.write(`  ${index + 1}. ${model}${marker}\n`)
-  }
-}
-
-function defaultModelIndex(models: readonly string[], currentModel: string | undefined): number {
-  const index = currentModel === undefined ? -1 : models.indexOf(currentModel)
-  return index < 0 ? 0 : index
-}
-
-function parseModelChoice(
-  answer: string,
-  models: readonly string[],
-  fallbackIndex: number,
-): string {
-  const fallback = models[fallbackIndex] ?? models[0]
-  if (fallback === undefined) {
-    throw new Error("model selection requires at least one model")
-  }
-  const trimmed = answer.trim()
-  if (trimmed.length === 0) {
-    return fallback
-  }
-  const selectedIndex = Number.parseInt(trimmed, 10) - 1
-  if (!Number.isInteger(selectedIndex) || selectedIndex < 0 || selectedIndex >= models.length) {
-    throw new Error(`invalid model selection: ${answer}`)
-  }
-  return models[selectedIndex] ?? fallback
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -2,13 +2,12 @@ import { mkdir, readFile, writeFile } from "node:fs/promises"
 import { dirname, join, relative, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 import { z } from "zod"
-import { loadRetrospecAgentModelConfig } from "./config"
 import { retrospecConfigDefaults } from "./opencode-defaults"
 import { mergeRetrospecMcpConfig, retrospecMcpServerName } from "./opencode-install-mcp"
 import {
   type InstallModelSelectionOptions,
-  applyInstallModelEnv,
-  resolveInstallModel,
+  type RetrospecInstallAgentModels,
+  resolveInstallAgentModels,
 } from "./opencode-install-model"
 
 const opencodeConfigSchema = z.object({
@@ -123,12 +122,11 @@ export async function installRetrospecOpenCodeConfig(
   const configPath = join(projectRoot, ".opencode", "opencode.jsonc")
   const pluginPath = join(projectRoot, retrospecAgentOrderPluginPath)
   const config = await readOpenCodeConfig(configPath)
-  const installModel = await resolveInstallModel(config, env, options)
-  const agentConfig = loadRetrospecAgentModelConfig(applyInstallModelEnv(env, installModel))
+  const agentModels = await resolveInstallAgentModels(config, env, options)
   const existingAgents = toAgentRecord(config.agent)
   const addedAgents: string[] = []
 
-  for (const agent of createRetrospecAgentDefinitions(agentConfig.agents)) {
+  for (const agent of createRetrospecAgentDefinitions(agentModels)) {
     const installedAgent = createInstalledAgent(agent, dirname(configPath))
     if (!Object.hasOwn(existingAgents, agent.key)) {
       existingAgents[agent.key] = installedAgent
@@ -162,7 +160,7 @@ export async function installRetrospecOpenCodeConfig(
     configPath,
     pluginPath,
     addedAgents,
-    agentModel: agentConfig.defaultModel,
+    agentModel: agentModels.retrospec,
     mcpServer: retrospecMcpServerName,
   }
 }
@@ -188,46 +186,46 @@ function createRetrospecConfig(value: unknown): Record<string, unknown> {
 }
 
 function createRetrospecAgentDefinitions(
-  models: ReturnType<typeof loadRetrospecAgentModelConfig>["agents"],
+  models: RetrospecInstallAgentModels,
 ): readonly AgentDefinition[] {
   return [
     {
       key: "retrospec",
       mode: "primary",
       promptPath: "agents/retrospec/AGENT.md",
-      model: models.Curator,
+      model: models.retrospec,
     },
-    { key: "retro", mode: "primary", promptPath: "agents/retro/AGENT.md", model: models.Surveyor },
-    { key: "spec", mode: "primary", promptPath: "agents/spec/AGENT.md", model: models.Curator },
+    { key: "retro", mode: "primary", promptPath: "agents/retro/AGENT.md", model: models.retro },
+    { key: "spec", mode: "primary", promptPath: "agents/spec/AGENT.md", model: models.spec },
     {
       key: "archivist",
       mode: "subagent",
       promptPath: "agents/Archivist/AGENT.md",
-      model: models.Archivist,
+      model: models.archivist,
     },
     {
       key: "curator",
       mode: "subagent",
       promptPath: "agents/Curator/AGENT.md",
-      model: models.Curator,
+      model: models.curator,
     },
     {
       key: "surveyor",
       mode: "subagent",
       promptPath: "agents/Surveyor/AGENT.md",
-      model: models.Surveyor,
+      model: models.surveyor,
     },
     {
       key: "appraiser",
       mode: "subagent",
       promptPath: "agents/Appraiser/AGENT.md",
-      model: models.Appraiser,
+      model: models.appraiser,
     },
     {
       key: "excavator",
       mode: "subagent",
       promptPath: "agents/Excavator/AGENT.md",
-      model: models.Excavator,
+      model: models.excavator,
     },
   ] as const
 }
