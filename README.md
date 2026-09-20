@@ -231,7 +231,7 @@ Dashboard는 daemon health, 등록 프로젝트, job ledger, analysis status, pr
 
 Dashboard export 화면은 GraphML/Cypher/Mermaid 파일을 내려받기 전에 가벼운 preview를 보여줍니다.
 
-![Retrospec GraphML export opened in Gephi](git-readme/graphml_gephi.png)
+![Retrospec GraphML export opened in Gephi](git-readme/graphml_grephi_2.png)
 
 Retrospec Agent로 추출한 GraphML 파일을 Gephi로 시각화한 예시입니다.
 
