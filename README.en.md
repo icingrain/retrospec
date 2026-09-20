@@ -209,7 +209,7 @@ The dashboard shows daemon health, registered projects, job ledgers, analysis st
 
 The exports dashboard shows lightweight previews before downloading GraphML, Cypher, and Mermaid files.
 
-![Retrospec GraphML export opened in Gephi](readme_files/graphml_grephi_2.png)
+![Retrospec GraphML export opened in Gephi](git-readme/graphml_gephi.png)
 
 Example visualization of a GraphML file extracted by Retrospec Agent and opened in Gephi.
 
