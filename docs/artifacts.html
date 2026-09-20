@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Retrospec Artifacts</title>
+    <meta name="description" content="Retrospec dashboard, exports, and MCP artifact notes." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230a2a3f'/%3E%3Cpath d='M19 44 8 33l11-11 5 5-6 6 6 6-5 5Zm26 0-5-5 6-6-6-6 5-5 11 11-11 11Z' fill='%23fff'/%3E%3Cpath d='m29 49 7-28 8 2-7 28-8-2Z' fill='%2300787c'/%3E%3C/svg%3E" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="docs-page">
+    <header class="site-header">
+      <a class="brand" href="index.html"><img src="assets/dev_io_new_logo.png" width="2172" height="724" alt="Retrospec" /></a>
+      <nav class="nav-links">
+        <a href="docs.html" data-i18n-en="Docs" data-i18n-ko="문서">Docs</a>
+        <a href="workflow.html" data-i18n-en="Workflow" data-i18n-ko="워크플로우">Workflow</a>
+        <a href="agent-install.html" data-i18n-en="Install Guide" data-i18n-ko="설치 가이드">Install Guide</a>
+        <a href="https://github.com/icingrain/retrospec">GitHub</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch">
+          <button class="lang-button active" type="button" data-lang-button="en">EN</button>
+          <button class="lang-button" type="button" data-lang-button="ko">KO</button>
+        </div>
+      </div>
+    </header>
+    <main class="docs-main doc-article">
+      <section class="docs-hero">
+        <p class="section-kicker" data-i18n-en="Artifacts" data-i18n-ko="산출물">Artifacts</p>
+        <h1 data-i18n-en="Dashboard, exports, and MCP" data-i18n-ko="Dashboard, export, MCP">Dashboard, exports, and MCP</h1>
+        <p data-i18n-en="Retrospec outputs are tied to daemon-owned local state, not scattered cache files." data-i18n-ko="Retrospec 산출물은 흩어진 cache가 아니라 daemon-owned local state에 연결됩니다.">Retrospec outputs are tied to daemon-owned local state, not scattered cache files.</p>
+      </section>
+      <section class="article-panel">
+        <h2 data-i18n-en="Dashboard" data-i18n-ko="Dashboard">Dashboard</h2>
+        <p data-i18n-en="The dashboard shows daemon health, registered projects, job ledger, analysis status, provider settings, uploads, and export previews. It is the fastest way to verify that a project is connected to the expected daemon and that retro/spec readiness is current." data-i18n-ko="dashboard는 daemon health, 등록 프로젝트, job ledger, analysis status, provider setting, upload, export preview를 보여줍니다. 프로젝트가 올바른 daemon에 연결됐고 retro/spec readiness가 최신인지 가장 빠르게 확인할 수 있습니다.">The dashboard shows daemon health, registered projects, job ledger, analysis status, provider settings, uploads, and export previews. It is the fastest way to verify that a project is connected to the expected daemon and that retro/spec readiness is current.</p>
+        <h2 data-i18n-en="Table exports" data-i18n-ko="Table export">Table exports</h2>
+        <p data-i18n-en="CSV and XLSX exports make structure and symbol analysis easy to inspect, share, and compare outside the dashboard." data-i18n-ko="CSV와 XLSX export는 structure/symbol 분석 결과를 dashboard 밖에서도 검토, 공유, 비교하기 쉽게 만듭니다.">CSV and XLSX exports make structure and symbol analysis easy to inspect, share, and compare outside the dashboard.</p>
+        <h2 data-i18n-en="Graph exports" data-i18n-ko="Graph export">Graph exports</h2>
+        <p data-i18n-en="GraphML is intended for graph tools such as Gephi and yEd. Cypher gives a draft import path for graph databases. Mermaid provides lightweight previews for README and design documents." data-i18n-ko="GraphML은 Gephi나 yEd 같은 graph tool에서 사용합니다. Cypher는 graph database import 초안으로 쓰고, Mermaid는 README나 설계 문서에서 가벼운 preview로 사용합니다.">GraphML is intended for graph tools such as Gephi and yEd. Cypher gives a draft import path for graph databases. Mermaid provides lightweight previews for README and design documents.</p>
+        <h2 data-i18n-en="MCP read surface" data-i18n-ko="MCP 조회">MCP read surface</h2>
+        <p data-i18n-en="The read-only MCP endpoint exposes project status and exploration tools to OpenCode-compatible clients. Agents can ask for readiness and anchors without writing daemon state or executing generated analysis directly." data-i18n-ko="read-only MCP endpoint는 OpenCode 호환 client에 프로젝트 상태와 탐색 도구를 제공합니다. agent는 daemon state를 수정하거나 generated analysis를 직접 실행하지 않고 readiness와 anchor를 조회할 수 있습니다.">The read-only MCP endpoint exposes project status and exploration tools to OpenCode-compatible clients. Agents can ask for readiness and anchors without writing daemon state or executing generated analysis directly.</p>
+        <h2 data-i18n-en="Why this matters" data-i18n-ko="왜 중요한가">Why this matters</h2>
+        <p data-i18n-en="All surfaces read the same daemon state. That keeps human review, agent prompts, exported files, and MCP responses aligned around evidence labels, support level, and missing capability notes." data-i18n-ko="dashboard, export, MCP가 모두 같은 daemon state를 읽습니다. 그래서 human review, agent prompt, export file, MCP response가 evidence label, support level, missing capability note 기준으로 정렬됩니다.">All surfaces read the same daemon state. That keeps human review, agent prompts, exported files, and MCP responses aligned around evidence labels, support level, and missing capability notes.</p>
+      </section>
+    </main>
+    <script src="docs-i18n.js"></script>
+  </body>
+</html>

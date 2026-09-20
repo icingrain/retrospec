@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Retrospec Agent — Excavate legacy code</title>
+    <meta
+      name="description"
+      content="Retrospec Agent provides AI-powered static analysis for legacy repositories, OpenCode agents, exports, dashboards, and MCP context."
+    />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" content="Retrospec Agent" />
+    <meta property="og:description" content="Excavate legacy code. Deliver insight." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://icingrain.github.io/retrospec/assets/dev_io_new_logo.png" />
+    <link rel="canonical" href="https://icingrain.github.io/retrospec/" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230a2a3f'/%3E%3Cpath d='M19 44 8 33l11-11 5 5-6 6 6 6-5 5Zm26 0-5-5 6-6-6-6 5-5 11 11-11 11Z' fill='%23fff'/%3E%3Cpath d='m29 49 7-28 8 2-7 28-8-2Z' fill='%2300787c'/%3E%3C/svg%3E"
+    />
+    <link rel="preload" href="assets/dev_io_new_logo.png" as="image" fetchpriority="high" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header" aria-label="Primary navigation">
+      <a class="brand" href="#top" aria-label="Retrospec Agent home">
+        <img src="assets/dev_io_new_logo.png" width="2172" height="724" alt="Retrospec" />
+      </a>
+      <nav class="nav-links" aria-label="Page sections">
+        <a href="#features" data-i18n-en="Features" data-i18n-ko="기능">Features</a>
+        <a href="#how-it-works" data-i18n-en="How It Works" data-i18n-ko="동작 방식">How It Works</a>
+        <a href="docs.html" data-i18n-en="Docs" data-i18n-ko="문서">Docs</a>
+        <a href="https://github.com/icingrain/retrospec">GitHub</a>
+      </nav>
+      <div class="header-actions">
+        <div class="language-switch" aria-label="Language switcher">
+          <button class="lang-button active" type="button" data-lang-button="en">EN</button>
+          <button class="lang-button" type="button" data-lang-button="ko">KO</button>
+        </div>
+      </div>
+    </header>
+
+    <main id="main">
+      <section id="top" class="hero" aria-labelledby="hero-title">
+        <div class="hero-main">
+          <div class="hero-copy">
+            <h1 id="hero-title">
+              <span data-i18n-en="Excavate Legacy Code." data-i18n-ko="레거시 코드를 발굴하고">
+                Excavate Legacy Code.
+              </span>
+              <span
+                class="accent"
+                data-i18n-en="Deliver Insight."
+              data-i18n-ko="인사이트를 전달하세요"
+              >
+                Deliver Insight.
+              </span>
+            </h1>
+            <p
+              class="hero-lede"
+              data-i18n-en="AI-powered static analysis for any language, without writing parsers."
+              data-i18n-ko="parser를 직접 작성하지 않아도, 어떤 언어든 AI 기반 정적 분석으로 이해합니다."
+            >
+              AI-powered static analysis for any language, without writing parsers.
+            </p>
+          </div>
+
+          <div id="install" class="terminal-card" aria-label="Install command">
+            <div class="traffic-lights" aria-hidden="true">
+              <span class="red"></span>
+              <span class="yellow"></span>
+              <span class="green"></span>
+            </div>
+            <code><span class="prompt">$</span> <span class="cmd">npm install</span> retrospec-agent</code>
+            <button class="copy-button" type="button" aria-label="Copy npm install command">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="8" y="8" width="11" height="11" rx="2"></rect>
+                <rect x="5" y="5" width="11" height="11" rx="2"></rect>
+              </svg>
+            </button>
+            <span class="copy-status" role="status" aria-live="polite"></span>
+            <span id="install-command" class="sr-only">npm install retrospec-agent</span>
+          </div>
+        </div>
+
+        <section id="features" class="feature-strip" aria-label="Retrospec features">
+          <article class="feature-item">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><circle cx="16" cy="16" r="12"></circle><path d="M4 16h24M16 4c4 4 6 8 6 12s-2 8-6 12M16 4c-4 4-6 8-6 12s2 8 6 12"></path></svg>
+            </div>
+            <div>
+              <h2 data-i18n-en="Language Agnostic" data-i18n-ko="언어 독립적">Language Agnostic</h2>
+              <p data-i18n-en="Works with any language" data-i18n-ko="어떤 언어든 분석">Works with any language</p>
+            </div>
+          </article>
+          <article class="feature-item">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><circle cx="16" cy="7" r="3"></circle><circle cx="8" cy="24" r="3"></circle><circle cx="24" cy="24" r="3"></circle><path d="m14.5 9.5-5 12M17.5 9.5l5 12M11 24h10"></path></svg>
+            </div>
+            <div>
+              <h2 data-i18n-en="Map Architecture" data-i18n-ko="아키텍처 매핑">Map Architecture</h2>
+              <p data-i18n-en="Discovers structure & patterns" data-i18n-ko="구조와 패턴 발견">Discovers structure & patterns</p>
+            </div>
+          </article>
+          <article class="feature-item">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path d="M16 5c-4 0-5 3-5 5-3 0-5 2-5 5s2 5 5 5c0 4 2 7 5 7s5-3 5-7c3 0 5-2 5-5s-2-5-5-5c0-2-1-5-5-5Z"></path><path d="M16 7v20M10 14h12M10 20h12"></path></svg>
+            </div>
+            <div>
+              <h2 data-i18n-en="AI-Generated Analysis" data-i18n-ko="AI 생성 분석">AI-Generated Analysis</h2>
+              <p data-i18n-en="Iterative, self-improving" data-i18n-ko="반복적으로 개선되는 분석">Iterative, self-improving</p>
+            </div>
+          </article>
+          <article class="feature-item">
+            <div class="feature-icon" aria-hidden="true">
+              <svg viewBox="0 0 32 32"><path d="M9 5h11l5 5v17H9z"></path><path d="M20 5v6h5M13 17h10M13 22h8"></path></svg>
+            </div>
+            <div>
+              <h2 data-i18n-en="Actionable Artifacts" data-i18n-ko="실행 가능한 산출물">Actionable Artifacts</h2>
+              <p data-i18n-en="Reports, mappings, data" data-i18n-ko="리포트, 매핑, 데이터">Reports, mappings, data</p>
+            </div>
+          </article>
+        </section>
+      </section>
+
+      <section id="how-it-works" class="info-section" aria-labelledby="how-title">
+        <div class="section-heading">
+          <p data-i18n-en="How it works" data-i18n-ko="동작 방식">How it works</p>
+          <h2 id="how-title" data-i18n-en="Status first. Daemon first. Evidence always." data-i18n-ko="status 먼저 daemon 먼저 근거는 항상 남깁니다">Status first. Daemon first. Evidence always.</h2>
+        </div>
+        <div class="step-grid">
+          <article>
+            <span>01</span>
+            <h3 data-i18n-en="Survey the repository" data-i18n-ko="저장소 조사">Survey the repository</h3>
+            <p data-i18n-en="Retrospec reads structure, symbols, SQL, dependencies, and coverage signals into local state." data-i18n-ko="Retrospec은 구조, 심볼, SQL, 의존성, coverage 신호를 로컬 상태로 읽어옵니다.">Retrospec reads structure, symbols, SQL, dependencies, and coverage signals into local state.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3 data-i18n-en="Validate analysis" data-i18n-ko="분석 검증">Validate analysis</h3>
+            <p data-i18n-en="Generated analyzers are reviewed with contracts and evidence before daemon jobs run." data-i18n-ko="generated analyzer는 daemon job 실행 전에 contract와 evidence로 검토됩니다.">Generated analyzers are reviewed with contracts and evidence before daemon jobs run.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3 data-i18n-en="Expose agent context" data-i18n-ko="에이전트 context 제공">Expose agent context</h3>
+            <p data-i18n-en="OpenCode agents consume dashboard state, exports, and read-only MCP tools instead of guessing." data-i18n-ko="OpenCode agent는 추측 대신 dashboard 상태, export, read-only MCP tool을 읽습니다.">OpenCode agents consume dashboard state, exports, and read-only MCP tools instead of guessing.</p>
+          </article>
+        </div>
+      </section>
+
+    </main>
+
+    <script>
+      const copyButton = document.querySelector('.copy-button');
+      const command = document.querySelector('#install-command');
+      const copyStatus = document.querySelector('.copy-status');
+      const langButtons = document.querySelectorAll('[data-lang-button]');
+      const i18nNodes = document.querySelectorAll('[data-i18n-en]');
+      const languageStorageKey = 'retrospec-site-language';
+
+      function applyLanguage(lang) {
+        langButtons.forEach((item) => item.classList.toggle('active', item.getAttribute('data-lang-button') === lang));
+        document.documentElement.lang = lang;
+        i18nNodes.forEach((node) => {
+          const next = node.getAttribute(`data-i18n-${lang}`);
+          if (next) node.textContent = next;
+        });
+      }
+
+      applyLanguage(localStorage.getItem(languageStorageKey) || 'en');
+
+      copyButton?.addEventListener('click', async () => {
+        if (!command?.textContent) return;
+        try {
+          await navigator.clipboard.writeText(command.textContent);
+          if (copyStatus) copyStatus.textContent = 'Install command copied.';
+        } catch {
+          if (copyStatus) copyStatus.textContent = command.textContent;
+        }
+        setTimeout(() => {
+          if (copyStatus) copyStatus.textContent = '';
+        }, 1600);
+      });
+
+      langButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+          const lang = button.getAttribute('data-lang-button') || 'en';
+          localStorage.setItem(languageStorageKey, lang);
+          applyLanguage(lang);
+        });
+      });
+    </script>
+  </body>
+</html>
