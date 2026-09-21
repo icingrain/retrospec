@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <img src="git-readme/retrospec_main_logo.jpeg" alt="Retrospec Agent logo" width="620">
+  <img src="git-readme/dev_io_logo3.png" alt="Retrospec Agent logo" width="620">
 </p>
 
 <p align="center">
@@ -42,7 +42,7 @@ Retrospec의 핵심은 **daemon-first, evidence-first**입니다. agent가 소�
 
 Retrospec은 하나의 agent가 모든 일을 직접 처리하지 않고, 역할을 나눠 안전하게 라우팅합니다. 아래 agent들이 검증 루프 이미지에 등장하는 주요 역할입니다.
 
-![Retrospec agent map](git-readme/agent_info.jpeg)
+![Retrospec agent map](git-readme/dev_io_agents.png)
 
 | Agent | 역할 |
 |---|---|
@@ -68,7 +68,7 @@ Runtime: Bun >= 1.3.0
 
 기본 규칙으로 분석하기 어려운 요청은 바로 거절하거나 임의 구현하지 않습니다. Retrospec은 사용자의 요구사항을 인터뷰를 통해 구체화하고, 다음 루프를 통해 분석 스크립트를 생성합니다.
 
-![Retrospec script validation loop](git-readme/retrospec_script_validation_loop.png)
+![Retrospec script validation loop](git-readme/dev_io_validation_loop.png)
 
 이 루프는 다음 경계를 지킵니다.
 
@@ -199,7 +199,7 @@ http://127.0.0.1:<port>/dashboard
 
 ## 동작 방식
 
-![Retrospec workflow](git-readme/workflow.png)
+![Retrospec workflow](git-readme/dev_io_workflow.png)
 
 Retrospec은 legacy source를 바로 AI에게 넘기지 않고, 먼저 정적 분석으로 구조를 파싱해 `retro` 분석 DB를 만듭니다. 그다음 `spec` AI 분석이 이 DB와 소스 근거를 함께 읽어 결과 DB를 채우고, 마지막으로 dashboard, CSV/XLSX, graph export, MCP read tool 같은 산출물로 확인합니다.
 

@@ -4,7 +4,7 @@
 </p>
 
 <p align="center">
-  <img src="git-readme/retrospec_main_logo.jpeg" alt="Retrospec Agent logo" width="620">
+  <img src="git-readme/dev_io_logo3.png" alt="Retrospec Agent logo" width="620">
 </p>
 
 <p align="center">
@@ -34,7 +34,7 @@ The current public release is built for **OpenCode workflows**. The CLI daemon a
 
 The current agent setup follows the OpenCode agent/subagent workflow. These are the main roles shown in the validation-loop diagram below.
 
-![Retrospec agent map](git-readme/agent_info.jpeg)
+![Retrospec agent map](git-readme/dev_io_agents.png)
 
 | Agent | Role |
 |---|---|
@@ -60,7 +60,7 @@ Analysis agents start from the language rules and parser strategies bundled in t
 
 When a request does not fit the default rules, Retrospec does not silently invent an analyzer. It interviews the user to define the extraction target, conditions, and success criteria, then creates an analysis script through this loop.
 
-![Retrospec script validation loop](git-readme/retrospec_script_validation_loop.png)
+![Retrospec script validation loop](git-readme/dev_io_validation_loop.png)
 
 The loop keeps these boundaries:
 
@@ -177,7 +177,7 @@ http://127.0.0.1:<port>/dashboard
 
 ## How it works
 
-![Retrospec workflow](git-readme/workflow.png)
+![Retrospec workflow](git-readme/dev_io_workflow.png)
 
 Retrospec does not send legacy source directly to AI first. It parses the code through static analysis, stores source-grounded structure in the `retro` analysis DB, then lets `spec` AI analysis combine that database with source evidence. The final results are written to results DBs and surfaced as dashboard views, CSV/XLSX files, graph exports, and MCP read tools.
 
